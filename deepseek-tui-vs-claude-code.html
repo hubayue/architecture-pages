@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeepSeek TUI vs Claude Code — 源码架构对比详解</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --ds: #4dabf7;
+    --cc: #f778ba;
+    --both: #3fb950;
+    --warn: #d29922;
+    --danger: #f85149;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.78;
+  }
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,17,23,0.94); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  nav strong { color: #fff; }
+  nav a { color: var(--ds); text-decoration: none; font-size: 13px; white-space: nowrap; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: var(--text-dim); }
+  .hero {
+    text-align: center; padding: 72px 24px 56px;
+    background: linear-gradient(180deg, #161b22 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero h1 { font-size: clamp(30px, 5vw, 48px); color: #fff; margin-bottom: 12px; }
+  .hero .sub { color: var(--text-dim); font-size: 17px; max-width: 700px; margin: 0 auto 24px; }
+  .badge {
+    display: inline-block; padding: 4px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; margin: 4px;
+  }
+  .bd-ds { background: rgba(77,171,247,0.15); color: var(--ds); border: 1px solid rgba(77,171,247,0.35); }
+  .bd-cc { background: rgba(247,119,186,0.15); color: var(--cc); border: 1px solid rgba(247,119,186,0.35); }
+  .bd-num { background: rgba(210,168,255,0.2); color: #d2a8ff; border: 1px solid rgba(210,168,255,0.4); }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 48px 0; border-bottom: 1px solid var(--border); }
+  h2 { font-size: 28px; color: #fff; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--both); display: inline-block; }
+  h3 { font-size: 20px; color: var(--both); margin: 28px 0 12px; }
+  h4 { font-size: 16px; color: var(--warn); margin: 18px 0 8px; }
+  p { margin-bottom: 14px; }
+  ul, ol { margin: 0 0 16px 24px; }
+  li { margin-bottom: 6px; }
+  .side-by-side {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0;
+  }
+  @media (max-width: 800px) { .side-by-side { grid-template-columns: 1fr; } }
+  .panel {
+    border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  }
+  .panel-header {
+    padding: 10px 14px; font-weight: 700; font-size: 14px;
+  }
+  .panel-header.ds { background: rgba(77,171,247,0.12); color: var(--ds); border-bottom: 1px solid var(--border); }
+  .panel-header.cc { background: rgba(247,119,186,0.12); color: var(--cc); border-bottom: 1px solid var(--border); }
+  .panel-body { padding: 14px; font-size: 13px; }
+  pre {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; overflow-x: auto; margin: 12px 0 20px;
+    font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+    font-size: 12.5px; line-height: 1.5;
+  }
+  .panel-body pre { margin: 0; border: none; background: transparent; padding: 0; }
+  code {
+    font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+    font-size: 12.5px; background: var(--surface); padding: 2px 6px; border-radius: 4px;
+  }
+  pre code { background: none; padding: 0; }
+  .c-ds { color: var(--ds); }
+  .c-cc { color: var(--cc); }
+  .flow {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px; margin: 16px 0; font-family: "JetBrains Mono", "Fira Code", monospace; font-size: 13px;
+    line-height: 2; white-space: pre; overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; font-size: 13px; }
+  th { background: var(--surface); font-weight: 600; color: #fff; }
+  tr:nth-child(even) { background: rgba(22,27,34,0.5); }
+  .td-ds { color: var(--ds); font-weight: 600; }
+  .td-cc { color: var(--cc); font-weight: 600; }
+  .callout {
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin: 16px 0;
+  }
+  .callout-title { font-weight: 700; margin-bottom: 4px; }
+  .note { border-left: 4px solid var(--ds); background: rgba(77,171,247,0.06); }
+  .note .callout-title { color: var(--ds); }
+  .insight { border-left: 4px solid var(--both); background: rgba(63,185,80,0.06); }
+  .insight .callout-title { color: var(--both); }
+  .warn { border-left: 4px solid var(--warn); background: rgba(210,153,34,0.06); }
+  .warn .callout-title { color: var(--warn); }
+  .danger { border-left: 4px solid var(--danger); background: rgba(248,81,73,0.06); }
+  .danger .callout-title { color: var(--danger); }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin: 20px 0; }
+  .toc a { color: var(--ds); text-decoration: none; display: block; padding: 3px 0; font-size: 14px; }
+  .toc a:hover { text-decoration: underline; }
+  .card-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px; margin: 16px 0;
+  }
+  .card {
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 18px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--both); }
+  .card h4 { margin-top: 0; color: var(--both); }
+  footer { text-align: center; padding: 32px; color: var(--text-dim); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <strong style="color:#fff;">🔍 架构对比</strong>
+  <span class="sep">|</span>
+  <a href="#overview">概述</a>
+  <a href="#flow">数据流</a>
+  <a href="#agent-loop">Agent循环</a>
+  <a href="#tools">工具体系</a>
+  <a href="#tui">TUI渲染</a>
+  <a href="#mcp">MCP集成</a>
+  <a href="#subagents">子Agent</a>
+  <a href="#context">上下文</a>
+  <a href="#models">模型适配</a>
+  <a href="#patterns">设计模式</a>
+  <a href="#matrix">决策矩阵</a>
+</nav>
+
+<div class="hero">
+<h1>DeepSeek TUI vs Claude Code</h1>
+<p class="sub">不是另一份"零件目录"。跟着一次真实对话请求，看数据在两条迥异的工程路径中如何流动、在哪里分岔、各自为什么那样设计。</p>
+<div>
+  <span class="badge bd-ds">DeepSeek TUI · Rust · ratatui · 16 crates</span>
+  <span class="badge bd-cc">Claude Code · TypeScript · Bun · React+Ink</span>
+  <span class="badge bd-num">两套源码均可读取</span>
+</div>
+</div>
+
+<div class="container">
+
+<div class="toc">
+<h3 style="margin-top:0;color:var(--both)">目录</h3>
+<a href="#overview">一、定位与技术栈对比</a>
+<a href="#flow">二、一根线穿到底：一次对话的完整数据流</a>
+<a href="#agent-loop">三、Agent 循环：心跳的两种写法</a>
+<a href="#tools">四、工具体系：Trait vs Factory</a>
+<a href="#tui">五、TUI 渲染：像素级控制 vs 声明式组件</a>
+<a href="#mcp">六、MCP 集成：从零自实现 vs 官方 SDK</a>
+<a href="#subagents">七、子 Agent 系统：持久会话 vs 三种隔离</a>
+<a href="#context">八、上下文管理：相同的理念，不同的实现</a>
+<a href="#models">九、模型适配与国产化路径</a>
+<a href="#patterns">十、设计模式对比</a>
+<a href="#matrix">十一、选型决策矩阵</a>
+</div>
+
+<section id="overview">
+<h2>一、定位与技术栈对比</h2>
+
+<h3>1.1 一句话定位</h3>
+<div class="side-by-side">
+  <div class="panel">
+    <div class="panel-header ds">DeepSeek TUI</div>
+    <div class="panel-body">
+      <p>面向 <strong>DeepSeek V4</strong> 模型的终端原生编程 Agent。自包含的 <strong>Rust 单二进制</strong>，不依赖 Node.js/Python 运行时。MIT 协议开源。</p>
+      <p style="margin-top:10px;"><strong>核心理念：</strong>把 Agent 作为终端的一个功能——MCP、子 Agent、RLM、持久化任务队列全部内置在一个二进制里。</p>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header cc">Claude Code</div>
+    <div class="panel-body">
+      <p>Anthropic 的<strong>终端 AI 编程助手 CLI</strong>，面向 Claude 模型。TypeScript + Bun 运行时，React/Ink 渲染终端 UI。</p>
+      <p style="margin-top:10px;"><strong>核心理念：</strong>Agent 是一个"终端里的 IDE"——完整的工具生态、权限系统、插件体系、多智能体协调，面向商业产品打磨。</p>
+    </div>
+  </div>
+</div>
+
+<h3>1.2 技术栈一览</h3>
+<table>
+  <tr><th style="width:16%;">维度</th><th class="td-ds" style="width:42%;">DeepSeek TUI</th><th class="td-cc" style="width:42%;">Claude Code</th></tr>
+  <tr><td>语言</td><td class="td-ds">Rust (edition 2024, rustc >= 1.88)</td><td class="td-cc">TypeScript (strict mode)</td></tr>
+  <tr><td>运行时</td><td class="td-ds"><strong>无外部依赖</strong>——编译为单二进制</td><td class="td-cc">Bun >= 1.3</td></tr>
+  <tr><td>终端 UI</td><td class="td-ds">ratatui（立即模式，像素级控制）</td><td class="td-cc">React 19 + 自研 Ink（声明式组件）</td></tr>
+  <tr><td>Agent 循环</td><td class="td-ds">Rust async/await + Channel 消息驱动</td><td class="td-cc">TypeScript async function* 生成器</td></tr>
+  <tr><td>工具系统</td><td class="td-ds">Trait-based ToolSpec + HashMap 注册表</td><td class="td-cc">Factory buildTool() + 类型安全的 Tool 接口</td></tr>
+  <tr><td>MCP 客户端</td><td class="td-ds"><strong>从零自实现</strong>（纯 Rust async, 4021行）</td><td class="td-cc">使用官方 @modelcontextprotocol/sdk</td></tr>
+  <tr><td>子 Agent</td><td class="td-ds">持久会话 (agent_open/agent_eval/agent_close) + RLM</td><td class="td-cc">三种隔离级别：Fork / Worktree / Background</td></tr>
+  <tr><td>LLM 客户端</td><td class="td-ds">自实现 OpenAI 兼容层 (DeepSeekClient, 2926行)</td><td class="td-cc">@anthropic-ai/sdk + 多Provider适配</td></tr>
+  <tr><td>部署方式</td><td class="td-ds">npm / Cargo / Homebrew / Docker / 直接下载</td><td class="td-cc">npm 发布</td></tr>
+  <tr><td>代码规模</td><td class="td-ds">~16 crates, 可控规模</td><td class="td-cc">~1,900 文件, ~512K 行</td></tr>
+  <tr><td>许可证</td><td class="td-ds"><strong>MIT</strong>——可商用、可修改、可闭源</td><td class="td-cc">专有（泄露源码仅供研究）</td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-title">💡 第一印象</div>
+  <p>DeepSeek TUI 是一个人能端起来的代码库。16 个 crate 各司其职，引擎核心在 <code>core/engine.rs</code>（1990行）+ <code>core/engine/turn_loop.rs</code>（2149行），工具注册在 <code>tools/registry.rs</code>（1366行），MCP 在 <code>mcp.rs</code>（4021行）——每个模块边界清晰，新人一周可以吃透核心流程。</p>
+  <p>Claude Code 是一个商业产品的完整工程——51万行 TypeScript，1900个文件，高度优化的启动路径、40+工具、80+命令、多层权限、遥测系统——学习曲线陡峭，但每一个设计决策都经过了生产环境的打磨。</p>
+</div>
+</section>
+
+<section id="flow">
+<h2>二、一根线穿到底：一次对话的完整数据流</h2>
+<p>这是本文的核心章节。跟踪<strong>一句真实的用户请求</strong>——<em>"把 login.ts 里的空指针异常修一下"</em>——看它在两个系统里分别怎样从输入变成结果。</p>
+
+<h3>2.1 宏观流程对比</h3>
+<div class="side-by-side">
+  <div class="panel">
+    <div class="panel-header ds">DeepSeek TUI 请求生命周期</div>
+    <div class="panel-body" style="font-size:12.5px; line-height:1.9;">
+<strong>1. 用户输入</strong><br>
+TUI -> EngineHandle.tx_op.send(Op::SendMessage)<br>
+通过 mpsc channel 进入引擎后台任务<br><br>
+
+<strong>2. 引擎接管</strong><br>
+engine.run() 收到 Op -> handle_send_message()<br>
+-> 创建 TurnContext -> Event::TurnStarted<br>
+-> handle_deepseek_turn() 进入 turn loop<br><br>
+
+<strong>3. 构建请求</strong><br>
+刷新系统提示词 -> 检查 prefix-cache<br>
+-> MessageRequest (model + messages + system + tools)<br>
+-> DeepSeekClient.create_message_stream()<br><br>
+
+<strong>4. 流式消费</strong><br>
+tokio::select! 监听：取消信号 / 流事件 / chunk超时<br>
+StreamEvent -> Event::Token / ThinkingStarted / ToolCallStarted<br>
+-> 通过 tx_event channel 实时推给 TUI<br><br>
+
+<strong>5. 工具执行</strong><br>
+tool_use -> 查询 ToolRegistry<br>
+-> tool.execute(input, context)<br>
+-> 结果注入消息历史 -> 继续循环<br><br>
+
+<strong>6. 回合结束</strong><br>
+Event::TurnComplete -> TUI 恢复可输入状态<br>
+<em>引擎和 TUI 始终在不同线程，通过 channel 解耦。</em>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header cc">Claude Code 请求生命周期</div>
+    <div class="panel-body" style="font-size:12.5px; line-height:1.9;">
+<strong>1. 用户输入</strong><br>
+Ink UI -> QueryEngine.submitMessage(userInput)<br>
+同线程调用，async function* 开始产出消息流<br><br>
+
+<strong>2. 预处理</strong><br>
+fetchSystemPromptParts() -- CLAUDE.md + MEMORY.md + Git<br>
+-> processUserInput() -- 解析斜杠命令 / @文件引用<br>
+-> 写入 transcript 磁盘日志<br><br>
+
+<strong>3. queryLoop 启动</strong><br>
+判断是否需要 AI 推理（纯命令可能跳过）<br>
+-> 检查是否需 compact<br>
+-> 准备消息列表<br><br>
+
+<strong>4. API 调用</strong><br>
+claude.ts 构建 Anthropic API 请求<br>
+-> anthropic.beta.messages.create({stream: true})<br>
+-> SSE 流式解析<br><br>
+
+<strong>5. 工具执行</strong><br>
+tool_use -> 权限裁决（规则->AI分类器->用户确认）<br>
+-> Tool.call() -> runTools() 并发执行<br>
+-> 结果追加到对话历史 -> 继续 loop<br><br>
+
+<strong>6. 回合结束</strong><br>
+stop_reason: end_turn -> 退出 queryLoop<br>
+-> Ink 重新渲染 -> 用户看到结果<br>
+<em>UI 和引擎在同一线程，通过 React 状态驱动。</em>
+    </div>
+  </div>
+</div>
+
+<h3>2.2 架构本质差异：消息驱动 vs 同线程生成器</h3>
+<div class="side-by-side">
+  <div class="panel">
+    <div class="panel-header ds">DeepSeek TUI：Channel 解耦</div>
+    <div class="panel-body">
+      <pre><code>// 引擎在独立的 tokio 任务中运行
+// TUI 只通过 EngineHandle 发送 Op / 接收 Event
+
+<span class="c-ds">// 发送用户消息（TUI 线程）</span>
+engine_handle.tx_op.send(Op::SendMessage {
+    content: "修一下 login.ts 的空指针",
+    mode: AppMode::Agent,
+}).await;
+
+<span class="c-ds">// 接收实时事件（TUI 线程）</span>
+while let Some(event) = rx_event.recv().await {
+    match event {
+        Event::Token { text, .. } => <span class="c-ds">// 追加到当前块</span>
+        Event::ToolCallStarted { .. } => <span class="c-ds">// 渲染工具卡片</span>
+        Event::TurnComplete { .. } => <span class="c-ds">// 恢复输入</span>
+    }
+}</code></pre>
+      <p style="margin-top:8px;">TUI 永不阻塞。Agent 思考时用户可滚动历史、切换会话、Ctrl+C 取消。</p>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header cc">Claude Code：生成器驱动</div>
+    <div class="panel-body">
+      <pre><code><span class="c-cc">// QueryEngine 是 async function*</span>
+async *submitMessage(userInput: string) {
+    const systemParts = await fetchSystemPromptParts();
+    const ctx = await processUserInput(userInput);
+    yield* this.queryLoop();  <span class="c-cc">// 主循环</span>
+    yield { type: 'result', content: finalMessage };
+}
+
+<span class="c-cc">// 消费者（Ink 组件）</span>
+for await (const msg of engine.submitMessage(input)) {
+    <span class="c-cc">// setState -> Ink 重渲染</span>
+}</code></pre>
+      <p style="margin-top:8px;">代码写起来像同步逻辑，但 UI 更新嵌在 Agent 循环中。</p>
+    </div>
+  </div>
+</div>
+
+<div class="callout insight">
+  <div class="callout-title">💡 为什么这个差异重要？</div>
+  <p>DeepSeek TUI 的 <strong>Channel 解耦架构</strong>意味着：TUI渲染、输入处理、Agent推理是三个独立任务。天然支持 Agent 思考时滚动历史、Ctrl+C 取消、管理多个会话。</p>
+  <p>Claude Code 的<strong>生成器驱动</strong>更简单直接，但用户输入被阻塞直到当前回合完成（CC 对此做了大量优化，含后台子Agent异步执行）。</p>
+  <p style="margin-bottom:0;"><strong>如果需要在 Agent 工作时保持 UI 完全响应，DeepSeek TUI 架构更友好。</strong></p>
+</div>
+</section>
+
+<section id="agent-loop">
+<h2>三、Agent 循环：心跳的两种写法</h2>
+
+<h3>3.1 循环结构对比</h3>
+<div class="side-by-side">
+  <div class="panel">
+    <div class="panel-header ds">DeepSeek TUI · turn_loop.rs (handle_deepseek_turn)</div>
+    <div class="panel-body">
+      <pre><code><span class="c-ds">// 主循环：loop + tokio::select!</span>
+loop {
+    if self.cancel_token.is_cancelled() { break; }
+    while let Ok(steer) = self.rx_steer.try_recv() { ... }
+    self.refresh_system_prompt(mode);
+    if turn.at_max_steps() { break; }
+
+    <span class="c-ds">// 自动 compact + 容量检查</span>
+    if should_compact(...) { compact_messages_safe(...); }
+    if self.run_capacity_pre_request_checkpoint(...) { continue; }
+
+    <span class="c-ds">// 构建请求 -> 流式发送</span>
+    let request = MessageRequest { model, messages, system, tools, ... };
+    let stream = client.create_message_stream(request).await;
+
+    <span class="c-ds">// 流式消费（带 steer 检查 + chunk 超时）</span>
+    loop {
+        tokio::select! {
+            _ = cancel_token.cancelled() => break,
+            result = timeout(chunk_timeout, stream.next()) => {
+                <span class="c-ds">// TextDelta / ToolUse / Thinking -> Event 推送</span>
+            }
+        }
+    }
+
+    <span class="c-ds">// 执行工具</span>
+    for tool_use in tool_uses {
+        execute_tool_and_stream_result(tool_use, registry, ...);
+    }
+    if stop_reason != "tool_use" { break; }
+}</code></pre>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header cc">Claude Code · query.ts (queryLoop)</div>
+    <div class="panel-body">
+      <pre><code><span class="c-cc">// while(true) + async/await</span>
+async queryLoop() {
+    while (true) {
+        const messages = this.messagesSinceCompact();
+        await this.applyToolResultBudget(messages);
+        const systemParts = await this.buildSystemPrompt();
+
+        if (this.shouldAutoCompact()) {
+            await this.compactService.compact();
+        }
+
+        <span class="c-cc">// API 调用</span>
+        const response = await deps.makeAPIRequest({
+            model, messages, system, tools, stream: true
+        });
+
+        <span class="c-cc">// 流式处理</span>
+        for await (const chunk of response) {
+            if (chunk.type === 'content_block_delta')
+                yield { type: 'text', content: chunk.delta.text };
+            if (chunk.type === 'tool_use') toolUses.push(chunk);
+        }
+
+        <span class="c-cc">// 执行工具</span>
+        if (toolUses.length > 0) {
+            const results = await this.runTools(toolUses);
+            this.appendResults(results);
+            continue;
+        }
+
+        await this.handleStopHooks();
+        if (stopReason === 'end_turn') break;
+    }
+}</code></pre>
+    </div>
+  </div>
+</div>
+
+<h3>3.2 关键差异点</h3>
+<table>
+  <tr><th style="width:22%;">差异点</th><th class="td-ds" style="width:39%;">DeepSeek TUI</th><th class="td-cc" style="width:39%;">Claude Code</th></tr>
+  <tr><td>取消机制</td><td class="td-ds">CancellationToken 每步检查——Esc 即时中断</td><td class="td-cc">AbortController API层取消——需传播到UI</td></tr>
+  <tr><td>中途输入</td><td class="td-ds"><strong>Steer机制</strong>——Agent思考时可注入新指令（rx_steer channel）</td><td class="td-cc">无中途输入——必须等当前回合完成</td></tr>
+  <tr><td>容量控制</td><td class="td-ds"><strong>CapacityController</strong>——每步前检查风险级别</td><td class="td-cc">依赖权限系统裁决</td></tr>
+  <tr><td>透明重试</td><td class="td-ds">流断开且无内容时自动重发（最多3次）</td><td class="td-cc">依赖 SDK 重试策略</td></tr>
+  <tr><td>Checkpoint</td><td class="td-ds"><strong>Cycle机制</strong>——token超阈值自动新周期+briefing</td><td class="td-cc">多级Compact：Snip->Micro->Collapse->Auto</td></tr>
+  <tr><td>Prefix-cache</td><td class="td-ds"><strong>主动追踪</strong>——每turn检查hash稳定性，TUI显示命中率</td><td class="td-cc">依赖API层，客户端无显式追踪</td></tr>
+</table>
+
+<div class="callout note">
+  <div class="callout-title">🔍 Steer 机制——DeepSeek TUI 的独有武器</div>
+  <p>Agent 正在流式生成时，用户可以注入新指令。你说"修 login.ts 的空指针"，Agent 开始读文件——你发现它理解错了，<strong>不等完成直接输入"不是 login.ts，是 auth.ts"</strong>。Agent 收到 steer，下一轮API调用调整方向。Claude Code 做不到。</p>
+  <pre><code>// 每个 chunk 后检查 rx_steer channel
+while let Ok(steer) = self.rx_steer.try_recv() {
+    pending_steers.push(steer);
+    <span class="c-ds">// 下轮 API 作为新 user message 注入</span>
+}</code></pre>
+</div>
+</section>
+
+<section id="tools">
+<h2>四、工具体系：Trait vs Factory</h2>
+
+<h3>4.1 接口定义对比</h3>
+<div class="side-by-side">
+  <div class="panel">
+    <div class="panel-header ds">DeepSeek TUI：ToolSpec Trait</div>
+    <div class="panel-body">
+      <pre><code><span class="c-ds">/// 所有工具必须实现此 trait</span>
+#[async_trait]
+pub trait ToolSpec: Send + Sync {
+    fn name(&self) -> &str;
+    fn description(&self) -> &str;
+    fn input_schema(&self) -> Value;
+    async fn execute(&self, input: Value, context: &ToolContext)
+        -> Result&lt;ToolResult, ToolError&gt;;
+    fn capabilities(&self) -> Vec&lt;ToolCapability&gt; { vec![] }
+    fn approval_requirement(&self, input: &Value)
+        -> ApprovalRequirement { ApprovalRequirement::Default }
+}
+
+<span class="c-ds">/// 注册表：HashMap + OnceLock 缓存</span>
+pub struct ToolRegistry {
+    tools: HashMap&lt;String, Arc&lt;dyn ToolSpec&gt;&gt;,
+    context: ToolContext,
+    api_cache: OnceLock&lt;Vec&lt;Tool&gt;&gt;,  <span class="c-ds">// prefix-cache友好</span>
+}</code></pre>
+      <p style="margin-top:8px;">新增工具：实现 trait -> ToolRegistryBuilder 注册。3步。</p>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header cc">Claude Code：Tool + buildTool 工厂</div>
+    <div class="panel-body">
+      <pre><code><span class="c-cc">/// 类型安全的 Tool 接口</span>
+type Tool&lt;Input, Output, P&gt; = {
+    name: string;
+    inputSchema: Input;        <span class="c-cc">// Zod schema</span>
+    call(args, ctx, canUseTool, ...): Promise&lt;ToolResult&gt;;
+    description(input, opts): Promise&lt;string&gt;;
+    isReadOnly(input): boolean;
+    isConcurrencySafe(input): boolean;
+    checkPermissions(input, ctx): Promise&lt;PermissionResult&gt;;
+    renderToolUseMessage(input, ctx): ReactNode;  <span class="c-cc">// 渲染组件</span>
+    renderToolResultMessage(content, ctx): ReactNode;
+    isEnabled(): boolean;
+}
+
+<span class="c-cc">// 工厂函数填默认值</span>
+const FileEditTool = buildTool({
+    name: 'file_edit',
+    isReadOnly: () => false,
+    isConcurrencySafe: () => true,
+    inputSchema: z.object({
+        file_path: z.string(),
+        old_string: z.string(),
+        new_string: z.string(),
+    }),
+    async call(input, ctx) { /* 读取->替换->写入 */ }
+});</code></pre>
+      <p style="margin-top:8px;">新增工具：创建目录 -> buildTool组装 -> React组件 -> 注册。5步。</p>
+    </div>
+  </div>
+</div>
+
+<h3>4.2 新增工具路径</h3>
+<table>
+  <tr><th class="td-ds" style="width:50%;">DeepSeek TUI</th><th class="td-cc" style="width:50%;">Claude Code</th></tr>
+  <tr>
+    <td class="td-ds">1. 实现 ToolSpec trait<br>2. ToolRegistryBuilder 注册<br>3. (可选) engine.rs 按模式过滤</td>
+    <td class="td-cc">1. 创建 src/tools/NewTool/ 目录<br>2. buildTool() 组装接口<br>3. React 组件定义渲染<br>4. getAllBaseTools() 注册<br>5. 权限钩子配置</td>
+  </tr>
+</table>
+
+<div class="callout note">
+  <div class="callout-title">🔍 OnceLock API 缓存 —— prefix-cache 优化的关键</div>
+  <pre><code>// 工具注册表变更 -> 缓存失效
+// 下次 to_api_tools() 惰性重建
+// 同 turn 内返回同一份字节 -> KV prefix cache 命中最大化
+pub fn register(&mut self, tool: Arc&lt;dyn ToolSpec&gt;) {
+    self.tools.insert(name, tool);
+    <span class="c-ds">self.invalidate_api_cache();</span>
+}
+pub fn to_api_tools_with_cache(&self) -> &Vec&lt;Tool&gt; {
+    self.api_cache.get_or_init(|| self.build_api_tools())
+}</code></pre>
+</div>
+</section>
+
+<section id="tui">
+<h2>五、TUI 渲染：像素级控制 vs 声明式组件</h2>
+
+<h3>5.1 渲染哲学</h3>
+<div class="side-by-side">
+  <div class="panel">
+    <div class="panel-header ds">ratatui 立即模式 (60fps 全量重绘)</div>
+    <div class="panel-body">
+      <pre><code><span class="c-ds">// 每一帧完整重建终端画面</span>
+fn render(frame: &mut Frame, app: &App) {
+    let [input, chat, status] = Layout::vertical([
+        Constraint::Length(4),
+        Constraint::Min(0),
+        Constraint::Length(1)
+    ]).areas(frame.area());
+
+    for block in app.active_session().blocks() {
+        match &block.content {
+            BlockContent::AgentText { text, .. } => {
+                frame.render_widget(Paragraph::new(text), area);
+            }
+            BlockContent::ToolCall { name, status, .. } => {
+                frame.render_widget(ToolCallCard::new(name, status), area);
+            }
+        }
+    }
+}</code></pre>
+      <p style="margin-top:8px;">无虚拟DOM diff，无组件生命周期——直接写入终端缓冲。</p>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header cc">React + Ink 声明式</div>
+    <div class="panel-body">
+      <pre><code><span class="c-cc">// React 组件 —— 声明式 UI</span>
+const ChatView: React.FC = () => {
+    const [messages, setMessages] = useState([]);
+    return (
+        &lt;Box flexDirection="column"&gt;
+            &lt;ScrollView&gt;
+                {messages.map(msg => 
+                    &lt;MessageBlock key={msg.id} message={msg} /&gt;
+                )}
+            &lt;/ScrollView&gt;
+            &lt;InputBox onSubmit={handleSubmit} /&gt;
+            &lt;StatusBar model={model} cost={cost} /&gt;
+        &lt;/Box&gt;
+    );
+};</code></pre>
+      <p style="margin-top:8px;">React virtual DOM diff + Ink 终端输出。会用 React 就能上手。</p>
+    </div>
+  </div>
+</div>
+
+<h3>5.2 体验差异</h3>
+<table>
+  <tr><th style="width:20%;">场景</th><th class="td-ds" style="width:40%;">ratatui</th><th class="td-cc" style="width:40%;">React+Ink</th></tr>
+  <tr><td>流式输出</td><td class="td-ds">直接追加->下一帧自动显示，无diff开销</td><td class="td-cc">setState->VDOM diff->渲染，有延迟</td></tr>
+  <tr><td>多块并发</td><td class="td-ds">同帧原子更新——天然无撕裂</td><td class="td-cc">多次setState可能多次渲染</td></tr>
+  <tr><td>开发效率</td><td class="td-ds">需理解Widget/Layout——学习曲线中等</td><td class="td-cc">React开发者零学习成本</td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-title">💡 实际影响</div>
+  <p>选 DS 为基座：Dev1 需掌握 ratatui。好处是 Block 数据模型、流式状态、事件驱动已就位——Dev1 定制外观和交互，而非从零搭框架。</p>
+</div>
+</section>
+
+<section id="mcp">
+<h2>六、MCP 集成：从零自实现 vs 官方 SDK</h2>
+
+<h3>6.1 架构对比</h3>
+<div class="side-by-side">
+  <div class="panel">
+    <div class="panel-header ds">DeepSeek TUI · 自实现 (4021行纯Rust)</div>
+    <div class="panel-body">
+      <pre><code><span class="c-ds">// 三层抽象</span>
+
+<span class="c-ds">// 1. McpPool —— 连接池</span>
+struct McpPool { servers: HashMap&lt;String, McpConnection&gt; }
+
+<span class="c-ds">// 2. McpConnection —— 传输层</span>
+enum McpConnection {
+    Stdio { child: Child, stdin, stdout },
+    Http { client: reqwest::Client, endpoint },
+    WebSocket { ... }
+}
+
+<span class="c-ds">// 3. McpToolAdapter —— 包进 ToolSpec</span>
+impl ToolSpec for McpToolAdapter {
+    fn name(&self) -> &str { ... }
+    fn execute(&self, input, ctx) { 
+        self.pool.call_tool(&server, &tool, input).await 
+    }
+}</code></pre>
+      <p style="margin-top:8px;"><strong>优势：</strong>零外部依赖、完全可控、集成 Rust 异步。<br>
+      <strong>代价：</strong>自行维护 MCP 协议兼容性。</p>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header cc">Claude Code · 官方 SDK</div>
+    <div class="panel-body">
+      <pre><code><span class="c-cc">import { Client } from '@modelcontextprotocol/sdk';
+import { StdioClientTransport } from '.../stdio.js';
+
+const transport = new StdioClientTransport({
+    command: 'node', args: ['godot-mcp-server.js'],
+});
+const client = new Client({ name: 'claude-code' });
+await client.connect(transport);
+
+<span class="c-cc">// MCPTool —— 薄壳代理</span>
+class McpToolWrapper implements Tool {
+    async call(input) {
+        return client.callTool({ name, arguments: input });
+    }
+}</code></pre>
+      <p style="margin-top:8px;"><strong>优势：</strong>官方维护协议、社区生态（Godot MCP Pro等开箱即用）。<br>
+      <strong>代价：</strong>依赖npm生态、Bun兼容性问题。</p>
+    </div>
+  </div>
+</div>
+
+<div class="callout note">
+  <div class="callout-title">🔍 大结果路由 (Large Output Router) —— 游戏场景杀手功能</div>
+  <p>MCP工具返回超大结果（如完整 Godot 场景树）时，DS 不会直接塞进 LLM 上下文，而是存入 Workshop 变量存储，只给 LLM 摘要+引用句柄：</p>
+  <pre><code>match router.route(tool_name, &result, raw_bypass) {
+    RouteDecision::PassThrough => {}        <span class="c-ds">// 结果小，直接传</span>
+    RouteDecision::Synthesise { .. } => {
+        workshop_vars.store(handle_name, raw_output);
+        return ToolResult::success(summary)
+            .with_handle(VarHandle { ... });  <span class="c-ds">// 摘要+句柄</span>
+    }
+}</code></pre>
+  <p>Godot场景树、Unity Prefab、大型配表都可能远超 token 预算。Claude Code 无此机制。</p>
+</div>
+</section>
+
+<section id="subagents">
+<h2>七、子 Agent 系统：持久会话 vs 三种隔离</h2>
+
+<div class="side-by-side">
+  <div class="panel">
+    <div class="panel-header ds">DeepSeek TUI · 持久会话 + RLM</div>
+    <div class="panel-body">
+      <pre><code><span class="c-ds">// agent_open —— 非阻塞，立即返回</span>
+let runtime = SubAgentRuntime::builder()
+    .with_client(client.clone())
+    .with_context(tool_context)
+    .background_runtime();
+manager.spawn_background(manager, runtime,
+    SubAgentType::General, prompt, None);
+
+<span class="c-ds">// 父Agent继续工作</span>
+<span class="c-ds">// &lt;deepseek:subagent.done&gt;</span>
+<span class="c-ds">// 大结果通过 VarHandle 按需读取</span>
+
+<span class="c-ds">// RLM —— Python REPL 会话</span>
+rlm_open("analysis", file_path);
+rlm_eval("analysis", python_code);
+<span class="c-ds">// sub_query_batch 并行执行子任务</span>
+rlm_close("analysis");</code></pre>
+      <p style="margin-top:8px;">并发上限：默认10，可配至20。独立上下文+工具注册表。</p>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header cc">Claude Code · AgentTool + Coordinator</div>
+    <div class="panel-body">
+      <pre><code><span class="c-cc">// Fork Agent —— 继承父prompt cache，零成本首调用</span>
+agentTool.call({ subagent_type: 'general',
+    prompt: '修复 login.ts 的所有类型错误' });
+
+<span class="c-cc">// Worktree Agent —— 隔离文件系统</span>
+agentTool.call({ prompt: '重构DB层',
+    isolation: 'worktree' });
+
+<span class="c-cc">// Background Agent —— 异步后台</span>
+agentTool.call({ prompt: '跑完整测试套件',
+    run_in_background: true });</code></pre>
+      <p style="margin-top:8px;">协调器模式：主Agent拆解->精确worker prompt->分发->汇总。</p>
+    </div>
+  </div>
+</div>
+
+<table>
+  <tr><th>维度</th><th class="td-ds">DeepSeek TUI</th><th class="td-cc">Claude Code</th></tr>
+  <tr><td>生命周期</td><td class="td-ds"><strong>持久会话</strong>——open/keep/eval/close，跨多轮交互</td><td class="td-cc"><strong>即用即抛</strong></td></tr>
+  <tr><td>隔离级别</td><td class="td-ds">独立上下文+独立工具注册表</td><td class="td-cc">Fork/Worktree/Background 三种</td></tr>
+  <tr><td>结果传递</td><td class="td-ds">VarHandle机制——大结果不占父上下文</td><td class="td-cc">直接注入对话历史</td></tr>
+  <tr><td>批量分析</td><td class="td-ds"><strong>RLM系统</strong>——Python REPL + sub_query_batch</td><td class="td-cc">无等价物</td></tr>
+</table>
+</section>
+
+<section id="context">
+<h2>八、上下文管理：相同的理念，不同的实现</h2>
+
+<table>
+  <tr><th style="width:18%;">机制</th><th class="td-ds" style="width:41%;">DeepSeek TUI</th><th class="td-cc" style="width:41%;">Claude Code</th></tr>
+  <tr><td>项目上下文</td><td class="td-ds">instructions.md + AGENTS.md/CLAUDE.md 自动发现 -> 系统提示词</td><td class="td-cc">CLAUDE.md + MEMORY.md -> 系统提示词</td></tr>
+  <tr><td>Git上下文</td><td class="td-ds">Working Set追踪——观察用户操作文件，只注入相关元数据</td><td class="td-cc">Git状态（分支/变更/提交）-> memoized缓存</td></tr>
+  <tr><td>压缩策略</td><td class="td-ds"><strong>Cycle机制</strong>——token超阈值->新周期+briefing。Compaction是可选退路</td><td class="td-cc"><strong>多级Compact</strong>——Snip->Microcompact->Collapse->Auto</td></tr>
+  <tr><td>记忆系统</td><td class="td-ds">文件系统Markdown（memory.md+note工具）——与CC相同理念</td><td class="td-cc">文件系统Markdown（4类记忆+索引+安全机制）</td></tr>
+  <tr><td>技能系统</td><td class="td-ds">SKILL.md文件->GitHub安装->注入系统提示词</td><td class="td-cc">Skill是斜杠命令加载来源->注入prompt</td></tr>
+</table>
+</section>
+
+<section id="models">
+<h2>九、模型适配与国产化路径</h2>
+
+<div class="side-by-side">
+  <div class="panel">
+    <div class="panel-header ds">DeepSeek TUI · OpenAI 兼容层 (自实现2926行)</div>
+    <div class="panel-body">
+      <pre><code><span class="c-ds">// DeepSeekClient —— /chat/completions 端点</span>
+pub struct DeepSeekClient {
+    base_url: String,  <span class="c-ds">// 可配置任意兼容端点</span>
+    api_key: String,
+    model: String,
+}
+
+<span class="c-ds">// 接入国产模型：改 base_url 即可</span>
+<span class="c-ds">// GLM-5.1:  https://open.bigmodel.cn/api/paas/v4</span>
+<span class="c-ds">// Qwen:     https://dashscope.aliyuncs.com/compatible-mode/v1</span>
+<span class="c-ds">// DeepSeek: https://api.deepseek.com</span>
+
+<span class="c-ds">// 内置 Auto 模式：每轮自动选Flash/Pro+推理强度</span></code></pre>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header cc">Claude Code · 多Provider适配</div>
+    <div class="panel-body">
+      <pre><code><span class="c-cc">// 客户端工厂</span>
+function getAnthropicClient() {
+    if (USE_BEDROCK) return new BedrockClient();
+    if (USE_VERTEX)  return new VertexAIClient();
+    return new Anthropic({ apiKey, baseURL });
+}
+
+<span class="c-cc">// 国产模型：需 Anthropic 兼容端点</span>
+<span class="c-cc">// ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic</span></code></pre>
+    </div>
+  </div>
+</div>
+
+<table>
+  <tr><th>适配点</th><th class="td-ds">DeepSeek TUI</th><th class="td-cc">Claude Code</th></tr>
+  <tr><td>API格式</td><td class="td-ds"><strong>OpenAI兼容</strong>——国产模型广泛支持，改URL即可</td><td class="td-cc"><strong>Anthropic原生</strong>——需国产模型提供兼容端点</td></tr>
+  <tr><td>模型路由</td><td class="td-ds"><strong>Auto模式内置</strong>——每轮自动选择+推理强度</td><td class="td-cc">手动切换模型</td></tr>
+  <tr><td>Thinking</td><td class="td-ds">原生支持thinking tokens（V4思考模式流式）</td><td class="td-cc">Claude Extended Thinking（Anthropic专有）</td></tr>
+  <tr><td>Prefix Cache</td><td class="td-ds"><strong>主动追踪</strong>——每turn检测，TUI显示命中率</td><td class="td-cc">依赖API层（自动，不透明）</td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-title">💡 国产化的影响</div>
+  <p>DeepSeek TUI 使用 <strong>OpenAI 兼容 API</strong>——接入GLM-5.1、Qwen3-Coder-Next、DeepSeek V3.1只需改一行配置。多模型路由是核心需求的话，DS 适配成本明显更低。</p>
+</div>
+</section>
+
+<section id="patterns">
+<h2>十、设计模式对比</h2>
+<table>
+  <tr><th style="width:16%;">模式</th><th class="td-ds" style="width:42%;">DeepSeek TUI</th><th class="td-cc" style="width:42%;">Claude Code</th></tr>
+  <tr><td><strong>消息解耦</strong></td><td class="td-ds">Channel：Op->Engine，Event<-Engine。不同线程</td><td class="td-cc">生成器：async function*，for await迭代</td></tr>
+  <tr><td><strong>工具注册</strong></td><td class="td-ds">Builder：ToolRegistryBuilder::new().with_agent().with_mcp().build()</td><td class="td-cc">工厂：buildTool()填默认值，assembleToolPool()合并过滤</td></tr>
+  <tr><td><strong>延迟加载</strong></td><td class="td-ds">工具按需注册——OCR需tesseract，不满足就不注册</td><td class="td-cc">cli.tsx快速路径——--version零加载；重型模块按需import()</td></tr>
+  <tr><td><strong>缓存策略</strong></td><td class="td-ds">OnceLock——工具目录/系统提示词hash缓存到下次变更</td><td class="td-cc">lodash/memoize——Git状态、命令列表等I/O密集路径</td></tr>
+  <tr><td><strong>错误恢复</strong></td><td class="td-ds">ErrorEnvelope分类——Auth/Network/Timeout/Context，带重试建议</td><td class="td-cc">按类型分类处理——API/工具执行/权限错误，各自恢复策略</td></tr>
+  <tr><td><strong>工作区保护</strong></td><td class="td-ds"><strong>Side-git快照</strong>——每turn前后独立git快照，支持/restore和revert_turn</td><td class="td-cc">无内置工作区快照——依赖项目自身git</td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-title">💡 Side-git 快照——内部推广的杀手功能</div>
+  <p>DS 每 turn 前后对工作区做独立 git 快照（不影响项目.git）。Agent 改坏了-><code>/restore</code>回滚到上一轮->继续。这在内部推广时极其重要——降低"AI把代码改乱了"的心理门槛。CC 没有独立快照层。</p>
+</div>
+</section>
+
+<section id="matrix">
+<h2>十一、选型决策矩阵</h2>
+
+<table>
+  <tr><th style="width:22%;">评估维度</th><th class="td-ds" style="width:18%;">DeepSeek TUI</th><th class="td-cc" style="width:18%;">Claude Code 源码</th><th style="width:18%;">从零构建</th><th style="width:24%;">推荐倾向</th></tr>
+  <tr><td>代码可控度</td><td class="td-ds">⭐⭐⭐⭐⭐<br>16 crates</td><td class="td-cc">⭐⭐<br>1900文件</td><td>⭐⭐⭐⭐⭐</td><td style="color:var(--both);">DS = 从零</td></tr>
+  <tr><td>起步速度</td><td class="td-ds">⭐⭐⭐⭐⭐<br>可直接编译</td><td class="td-cc">⭐⭐<br>补构建配置</td><td>⭐<br>6-9个月</td><td style="color:var(--both);">DS 显著领先</td></tr>
+  <tr><td>国产模型适配</td><td class="td-ds">⭐⭐⭐⭐⭐<br>OpenAI兼容</td><td class="td-cc">⭐⭐<br>需Anthropic端点</td><td>⭐⭐⭐⭐</td><td style="color:var(--both);">DS 显著领先</td></tr>
+  <tr><td>游戏垂直扩展</td><td class="td-ds">⭐⭐⭐⭐⭐<br>大结果路由+RLM</td><td class="td-cc">⭐⭐⭐<br>MCP SDK成熟</td><td>⭐⭐⭐</td><td style="color:var(--both);">DS</td></tr>
+  <tr><td>TUI 定制</td><td class="td-ds">⭐⭐⭐⭐<br>ratatui像素级</td><td class="td-cc">⭐⭐⭐⭐<br>React组件</td><td>⭐⭐</td><td style="color:var(--both);">平手</td></tr>
+  <tr><td>团队技能</td><td class="td-ds">⭐⭐⭐⭐<br>Rust(需学习)</td><td class="td-cc">⭐⭐⭐⭐<br>TS(有背景)</td><td>⭐⭐⭐</td><td style="color:var(--both);">平手</td></tr>
+  <tr><td>设计参考</td><td class="td-ds">⭐⭐⭐⭐<br>稳态架构</td><td class="td-cc">⭐⭐⭐⭐⭐<br>生产级打磨</td><td>⭐⭐</td><td style="color:var(--cc);">CC 领先</td></tr>
+  <tr><td>部署简易度</td><td class="td-ds">⭐⭐⭐⭐⭐<br>零运行时依赖</td><td class="td-cc">⭐⭐<br>需Bun+npm</td><td>⭐⭐⭐</td><td style="color:var(--both);">DS 显著领先</td></tr>
+  <tr><td>内部推广</td><td class="td-ds">⭐⭐⭐⭐⭐<br>快照+Steer</td><td class="td-cc">⭐⭐⭐<br>无快照保护</td><td>⭐⭐</td><td style="color:var(--both);">DS</td></tr>
+</table>
+
+<h3>推荐路径</h3>
+<div class="card-grid">
+  <div class="card">
+    <h4>🏗️ 基座：DeepSeek TUI (MIT)</h4>
+    <p>以 MIT 许可的 DS 为代码基座，直接获得 TUI + Agent循环 + 工具系统 + MCP + 子Agent + RLM。</p>
+  </div>
+  <div class="card">
+    <h4>📖 设计参考：Claude Code 源码</h4>
+    <p>精读 CC 的工具权限模型、Multi-agent 协调器、命令系统——但不在其代码上构建。</p>
+  </div>
+  <div class="card">
+    <h4>🔧 差异化投入</h4>
+    <p>三人主力押注国产模型路由、Godot MCP Server、游戏垂直工具链——这些才是壁垒所在。</p>
+  </div>
+  <div class="card">
+    <h4>🎯 6 个月里程碑</h4>
+    <p>能在内部游戏项目上跑起来——Agent 操作 Godot、自动化配表、生成 GDScript——有实际产出。</p>
+  </div>
+</div>
+
+<div class="callout insight" style="margin-top:20px;">
+  <div class="callout-title">💡 一句话总结</div>
+  <p style="font-size:16px;"><strong>DeepSeek TUI 提供"能跑通的工程底盘"——TUI、Agent循环、MCP、子Agent 都已就位。Claude Code 源码提供"生产级的设计智慧"——权限模型、协调器模式、上下文策略值得反复研读。把前者当车身，把后者当导航，把游戏垂直当引擎——这才是最快的路径。</strong></p>
+</div>
+</section>
+
+<footer>
+<p>基于 DeepSeek TUI v0.8.39 源码 和 Claude Code 2026-03-31 源码快照 分析整理</p>
+<p style="color:var(--text-dim);margin-top:8px;">分析日期：2026-05-18 · 仅供学习参考</p>
+</footer>
+
+</div>
+</body>
+</html>

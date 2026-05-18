@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 源码架构详解 — 由浅入深</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --purple: #d2a8ff;
+    --orange: #d29922;
+    --red: #f85149;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.8;
+  }
+
+  /* ── Navigation ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,17,23,0.94); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  nav a { color: var(--accent); text-decoration: none; font-size: 13px; white-space: nowrap; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: var(--text-dim); font-size: 12px; }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center; padding: 60px 24px 48px;
+    background: linear-gradient(180deg, #161b22 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero h1 { font-size: clamp(28px, 5vw, 44px); color: #fff; margin-bottom: 10px; }
+  .hero .sub { color: var(--text-dim); font-size: 17px; max-width: 650px; margin: 0 auto 20px; }
+  .badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 600; margin: 3px;
+  }
+  .bd-ts { background: rgba(49,120,198,0.2); color: #58a6ff; border: 1px solid rgba(49,120,198,0.4); }
+  .bd-bun { background: rgba(226,162,80,0.2); color: #e2a250; border: 1px solid rgba(226,162,80,0.4); }
+  .bd-react{ background: rgba(97,218,251,0.2); color: #61dafb; border: 1px solid rgba(97,218,251,0.4); }
+  .bd-num { background: rgba(210,168,255,0.2); color: #d2a8ff; border: 1px solid rgba(210,168,255,0.4); }
+
+  /* ── Container ── */
+  .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+
+  h2 { font-size: 26px; color: #fff; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); display: inline-block; }
+  h3 { font-size: 20px; color: var(--purple); margin: 28px 0 12px; }
+  h4 { font-size: 16px; color: var(--green); margin: 18px 0 8px; }
+  p { margin-bottom: 14px; }
+  ul, ol { margin: 0 0 16px 24px; }
+  li { margin-bottom: 6px; }
+
+  /* ── Code blocks ── */
+  pre {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; overflow-x: auto; margin: 12px 0 20px;
+    font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+    font-size: 13px; line-height: 1.5;
+  }
+  code {
+    font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+    font-size: 13px; background: var(--surface); padding: 2px 6px; border-radius: 4px;
+  }
+  pre code { background: none; padding: 0; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin: 16px 0;
+  }
+  .info { border-left: 4px solid var(--accent); background: rgba(88,166,255,0.06); }
+  .tip { border-left: 4px solid var(--green); background: rgba(63,185,80,0.06); }
+  .warn { border-left: 4px solid var(--orange); background: rgba(210,153,34,0.06); }
+  .danger { border-left: 4px solid var(--red); background: rgba(248,81,73,0.06); }
+  .callout-title { font-weight: 700; margin-bottom: 4px; }
+
+  /* ── Architecture diagram ── */
+  .arch-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px; margin: 16px 0;
+  }
+  .arch-card {
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 18px;
+    transition: border-color 0.2s;
+  }
+  .arch-card:hover { border-color: var(--accent); }
+  .arch-card h4 { margin-top: 0; color: var(--accent); }
+
+  /* ── Flow diagram ── */
+  .flow {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px; margin: 16px 0; font-family: monospace; font-size: 13px;
+    line-height: 2; white-space: pre; overflow-x: auto;
+  }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; }
+  th { background: var(--surface); font-weight: 600; color: #fff; }
+  tr:nth-child(even) { background: rgba(22,27,34,0.5); }
+
+  /* ── Progress / level indicator ── */
+  .level { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; margin-right: 8px; }
+  .l1 { background: rgba(63,185,80,0.2); color: var(--green); }
+  .l2 { background: rgba(210,153,34,0.2); color: var(--orange); }
+  .l3 { background: rgba(248,81,73,0.2); color: var(--red); }
+
+  /* ── Glossary ── */
+  .glossary { columns: 2; gap: 16px; margin: 16px 0; }
+  @media (max-width: 600px) { .glossary { columns: 1; } }
+  .glossary dt { font-weight: 700; color: var(--accent); margin-top: 12px; break-inside: avoid; }
+  .glossary dd { margin: 0 0 8px 8px; color: var(--text-dim); break-inside: avoid; }
+
+  /* ── Footer ── */
+  footer { text-align: center; padding: 32px; color: var(--text-dim); font-size: 13px; }
+
+  /* ── TOC ── */
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin: 20px 0; }
+  .toc a { color: var(--accent); text-decoration: none; display: block; padding: 3px 0; font-size: 14px; }
+  .toc a:hover { text-decoration: underline; }
+  .toc .toc-l2 { padding-left: 20px; }
+
+  .tag {
+    display: inline-block; padding: 1px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600; background: var(--surface); border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <strong style="color:#fff;margin-right:8px;">CC 架构详解</strong>
+  <span class="sep">|</span>
+  <a href="#overview">概述</a>
+  <a href="#structure">项目结构</a>
+  <a href="#startup">启动流程</a>
+  <a href="#query-engine">查询引擎</a>
+  <a href="#tool-system">工具体系</a>
+  <a href="#api-layer">API层</a>
+  <a href="#mcp">MCP集成</a>
+  <a href="#permission">权限系统</a>
+  <a href="#context">上下文管理</a>
+  <a href="#commands">命令系统</a>
+  <a href="#coordinator">多智能体</a>
+  <a href="#memory">记忆系统</a>
+  <a href="#patterns">设计模式</a>
+</nav>
+
+<!-- ════════════════ HERO ════════════════ -->
+<div class="hero">
+<h1>Claude Code 源码架构详解</h1>
+<p class="sub">一份由浅入深的架构指南，帮助团队快速理解 Claude Code 的核心设计</p>
+<div>
+  <span class="badge bd-ts">TypeScript</span>
+  <span class="badge bd-bun">Bun</span>
+  <span class="badge bd-react">React + Ink</span>
+  <span class="badge bd-num">~1,900 文件</span>
+  <span class="badge bd-num">~512K 行</span>
+</div>
+</div>
+
+<div class="container">
+
+<!-- ════════════════ TOC ════════════════ -->
+<div class="toc">
+<h3 style="margin-top:0;color:var(--accent)">目录</h3>
+<a href="#overview">一、项目概述</a>
+<a href="#structure">二、项目结构总览</a>
+<a href="#startup">三、启动流程</a>
+<a href="#query-engine">四、查询引擎（核心回路）</a>
+<a href="#tool-system">五、工具体系</a>
+<a href="#api-layer">六、API 层</a>
+<a href="#mcp">七、MCP 集成</a>
+<a href="#permission">八、权限系统</a>
+<a href="#context">九、上下文管理</a>
+<a href="#commands">十、命令系统</a>
+<a href="#coordinator">十一、多智能体协调</a>
+<a href="#memory">十二、记忆系统</a>
+<a href="#patterns">十三、关键设计模式</a>
+<a href="#summary">十四、总结：核心数据流</a>
+</div>
+
+<!-- ════════════════ 1. OVERVIEW ════════════════ -->
+<section id="overview">
+<h2>一、项目概述</h2>
+
+<h3>1.1 这是什么？</h3>
+<p>Claude Code 是 Anthropic 公司开发的<strong>终端 AI 编程助手 CLI 工具</strong>。它在终端中运行，能读取和编辑代码、执行 Shell 命令、搜索代码库、协调多智能体工作流。2026年3月31日，其 npm 包中的 source map 意外暴露了完整的 TypeScript 源码。</p>
+
+<h3>1.2 技术栈</h3>
+<table>
+  <tr><th>组件</th><th>技术</th><th>说明</th></tr>
+  <tr><td>语言</td><td>TypeScript (strict)</td><td>全量 strict 模式编译</td></tr>
+  <tr><td>运行时</td><td>Bun</td><td>替代 Node.js 的快速 JS 运行时</td></tr>
+  <tr><td>终端 UI</td><td>React 19 + 自研 Ink</td><td>用 React 组件渲染终端界面</td></tr>
+  <tr><td>CLI 框架</td><td>Commander.js 13</td><td>命令行参数解析</td></tr>
+  <tr><td>Schema 验证</td><td>Zod 3</td><td>运行时类型校验</td></tr>
+  <tr><td>API 通信</td><td>@anthropic-ai/sdk</td><td>调用 Claude 模型</td></tr>
+  <tr><td>协议</td><td>MCP + LSP</td><td>模型上下文协议、语言服务器协议</td></tr>
+</table>
+
+<h3>1.3 核心数据</h3>
+<ul>
+  <li><strong>40+ 个工具</strong>：Bash、文件读写、代码搜索、Web抓取、Agent、MCP工具等</li>
+  <li><strong>~80 个斜杠命令</strong>：/help、/model、/review、/compact 等</li>
+  <li><strong>QueryEngine.ts</strong>（1295行）：核心 Agent 回路</li>
+  <li><strong>claude.ts</strong>（3419行）：API 请求构建和流式处理</li>
+  <li><strong>main.tsx</strong>（4683行）：CLI 入口和模式分发</li>
+</ul>
+</section>
+
+<!-- ════════════════ 2. STRUCTURE ════════════════ -->
+<section id="structure">
+<h2>二、项目结构总览</h2>
+
+<h3>2.1 顶层目录</h3>
+<pre><code>src/
+├── entrypoints/     ← CLI入口（cli.tsx）
+├── cli/             ← CLI参数解析
+├── tools/           ← 40+个工具实现（每个工具一个子目录）
+├── commands/        ← 80+个斜杠命令
+├── services/        ← 后台服务（API、MCP、LSP、telemetry）
+│   ├── api/         ← Anthropic API 调用层
+│   └── mcp/         ← MCP 协议客户端
+├── hooks/           ← 权限裁决和处理
+├── query/           ← Agent 查询回路
+├── context/         ← 上下文管理（Git、CLAUDE.md）
+├── utils/           ← 工具函数
+│   ├── model/       ← 模型配置、别名、选择逻辑
+│   └── permissions/ ← 权限规则引擎
+├── coordinator/     ← 多智能体协调模式
+├── memdir/          ← 文件系统记忆
+├── skills/          ← 技能系统
+├── plugins/         ← 插件系统
+├── types/           ← 全局类型定义
+├── constants/       ← 常量定义
+├── bridge/          ← 远程/IDE桥接
+├── buddy/           ← 电子宠物彩蛋
+├── ink/             ← 自研 Ink 终端渲染引擎
+└── screens/         ← REPL 界面组件</code></pre>
+
+<h3>2.2 关键文件速查</h3>
+<table>
+  <tr><th>文件</th><th>行数</th><th>角色</th></tr>
+  <tr><td><code>entrypoints/cli.tsx</code></td><td>302</td><td>入口引导（快速路由分发）</td></tr>
+  <tr><td><code>main.tsx</code></td><td>4683</td><td>CLI启动、选项解析、模式分发</td></tr>
+  <tr><td><code>QueryEngine.ts</code></td><td>1295</td><td>核心 Agent：提交消息、管理对话状态</td></tr>
+  <tr><td><code>query.ts</code></td><td>1729</td><td>查询回路：迭代调用API、执行工具</td></tr>
+  <tr><td><code>services/api/claude.ts</code></td><td>3419</td><td>构建API请求、处理流式响应</td></tr>
+  <tr><td><code>services/api/client.ts</code></td><td>~316</td><td>API客户端工厂（多Provider）</td></tr>
+  <tr><td><code>Tool.ts</code></td><td>792</td><td>工具基类接口和工厂函数</td></tr>
+  <tr><td><code>tools.ts</code></td><td>389</td><td>工具注册和组装</td></tr>
+  <tr><td><code>commands.ts</code></td><td>754</td><td>命令注册</td></tr>
+  <tr><td><code>context.ts</code></td><td>189</td><td>Git状态和CLAUDE.md加载</td></tr>
+</table>
+</section>
+
+<!-- ════════════════ 3. STARTUP ════════════════ -->
+<section id="startup">
+<h2>三、启动流程</h2>
+
+<h3>3.1 整体流程图</h3>
+<div class="flow">
+cli.tsx:main()
+  │
+  ├─ --version / -v  ──→  打印版本号，立即退出（零模块加载）
+  ├─ --dump-system-prompt ──→ 渲染系统提示词
+  ├─ --daemon-worker   ──→  守护进程工作线程
+  ├─ daemon            ──→  长运行管理线程
+  ├─ remote/bridge/sync ──→  远程会话桥接
+  ├─ ps/logs/attach    ──→  后台会话管理
+  │
+  └─ 默认路径 ──→  await import('../main.js')
+                    │
+                    main.tsx:main()
+                      │
+                      ├─ preAction 钩子──→ init() → 加载设置、运行迁移
+                      │
+                      ├─ .action() 解析选项
+                      │     │
+                      │     ├─ --print  ──→  runHeadless()  → QueryEngine
+                      │     └─ 默认     ──→  launchRepl()   → React/Ink UI
+                      │
+                      └─ setup()
+                            ├─ 设置 CWD（工作目录）
+                            ├─ 创建 Worktree（可选）
+                            ├─ 初始化会话记忆
+                            ├─ 预取：命令列表、插件钩子、API密钥
+                            └─ 启动 REPL</div>
+
+<h3>3.2 关键设计：快速路径分发</h3>
+<p><code>cli.tsx</code> 使用了<strong>延迟动态导入</strong>策略。像 <code>--version</code> 这样的快速命令不会加载 React、Ink、或者任何工具模块，直接打印版本号退出。</p>
+
+<div class="callout tip">
+  <div class="callout-title">设计要点</div>
+  默认路径才执行 <code>await import('../main.js')</code>，这意味着只有在真正需要交互式会话时，才会加载 React、Ink 渲染引擎、工具注册表等重型模块。启动性能优化做得非常极致。
+</div>
+
+<h3>3.3 main.tsx 中的模式分发</h3>
+<p><code>main.tsx</code> 的 <code>.action()</code> 处理器（约 line 1007）是一个巨大的决策树，根据模式分叉：</p>
+<ul>
+  <li><strong>Headless 模式</strong>（<code>--print</code>）：无 UI，使用 <code>QueryEngine</code> 直接输出文本</li>
+  <li><strong>交互模式</strong>（默认）：启动 React/Ink REPL 终端界面</li>
+  <li><strong>初始化模式</strong>（<code>--init</code>）：只运行初始化钩子</li>
+  <li><strong>远程模式</strong>：通过 Bridge 与 IDE/Web 客户端通信</li>
+</ul>
+</section>
+
+<!-- ════════════════ 4. QUERY ENGINE ════════════════ -->
+<section id="query-engine">
+<h2>四、查询引擎 — 核心 Agent 回路</h2>
+
+<h3>4.1 定位</h3>
+<p>QueryEngine 是<strong>整个系统的核心</strong>。它管理对话状态、构建系统提示词、处理用户输入、驱动 API 调用、执行工具、输出结果。理解它就理解了 CC 的运作方式。</p>
+
+<h3>4.2 核心类结构</h3>
+<pre><code>class QueryEngine {
+  // —— 配置 ——
+  private config: QueryEngineConfig  // cwd, tools, commands, MCP客户端, agents...
+
+  // —— 对话状态（核心） ——
+  private mutableMessages: Message[]  // 完整对话历史
+
+  // —— 运行时状态 ——
+  private abortController: AbortController
+  private permissionDenials: SDKPermissionDenial[]
+  private totalUsage: NonNullableUsage        // token 用量追踪
+  private readFileState: FileStateCache       // 文件读缓存（LRU）
+
+  // —— 记忆 ——
+  private discoveredSkillNames: Set&lt;string&gt;
+  private loadedNestedMemoryPaths: Set&lt;string&gt;
+
+  // —— 核心方法 ——
+  async *submitMessage(userInput)   // 生成器：接收用户输入 → 产出消息流
+}</code></pre>
+
+<h3>4.3 submitMessage() 的执行步骤</h3>
+<div class="flow">
+用户输入 prompt
+    │
+    ▼
+1. 清空技能发现列表、设置 CWD
+    │
+    ▼
+2. 构建系统提示词 ── fetchSystemPromptParts()
+   （用户上下文 + 系统上下文 + 记忆机制）
+    │
+    ▼
+3. 处理用户输入 ── processUserInput()
+   （解析斜杠命令 → 构建 ToolUseContext）
+    │
+    ▼
+4. 记录对话到磁盘（transcript）
+    │
+    ▼
+5. 更新权限上下文 ── ToolPermissionContext
+    │
+    ▼
+6. 预取技能和插件（并行）
+    │
+    ▼
+7. 判断是否应该查询 API
+   ├─ 纯斜杠命令 → 直接返回结果
+   └─ 需要 AI 推理 → 进入 query() 循环
+                           │
+                           ▼
+                    queryLoop()  ← 核心迭代回路</div>
+
+<h3>4.4 queryLoop() — Agent 的"心跳"</h3>
+<p>这是 Agent 的无限循环，每次迭代做以下事情：</p>
+<ol>
+  <li><strong>准备工作</strong>：从 compact 边界后取消息、应用 tool result budget、压缩历史</li>
+  <li><strong>构建系统提示词</strong>：拼装完整 system prompt</li>
+  <li><strong>自动 Compact 检查</strong>：如果 token 数超阈值，调用 compact 服务做上下文总结</li>
+  <li><strong>调用 API</strong>：通过 <code>deps.makeAPIRequest()</code> 流式获取 LLM 回复</li>
+  <li><strong>执行工具</strong>：如果模型返回 tool_use 块，调用 <code>runTools()</code> 执行</li>
+  <li><strong>停止钩子</strong>：调用 <code>handleStopHooks()</code></li>
+  <li><strong>循环或退出</strong>：根据 stop_reason、预算、最大轮次决定</li>
+</ol>
+
+<h3>4.5 两个关键文件的分工</h3>
+<table>
+  <tr><th>文件</th><th>职责</th><th>类比</th></tr>
+  <tr><td><code>QueryEngine.ts</code></td><td>管理对话状态、构建提示词、处理用户输入、产出消息流</td><td>Agent 的"大脑皮层"</td></tr>
+  <tr><td><code>query.ts</code></td><td>执行 API 调用循环、处理工具结果、上下文压缩</td><td>Agent 的"神经回路"</td></tr>
+</table>
+</section>
+
+<!-- ════════════════ 5. TOOL SYSTEM ════════════════ -->
+<section id="tool-system">
+<h2>五、工具体系</h2>
+
+<h3>5.1 Tool 接口设计</h3>
+<p>每个工具都实现 <code>Tool&lt;Input, Output, P&gt;</code> 接口。核心方法如下：</p>
+
+<pre><code>type Tool&lt;Input, Output, P&gt; = {
+  // —— 元信息 ——
+  name: string                    // 工具名，如 'bash', 'file_edit'
+  aliases?: string[]              // 别名
+  searchHint?: string             // 搜索提示（3-10个字）
+
+  // —— Schema ——
+  inputSchema: Input              // Zod schema → 自动转为 JSON Schema
+  outputSchema?: z.ZodType&lt;unknown&gt;
+
+  // —— 核心行为 ——
+  call(args, context, canUseTool, parentMessage, onProgress?): Promise&lt;ToolResult&gt;
+  description(input, options): Promise&lt;string&gt;
+
+  // —— 权限 ——
+  isReadOnly(input): boolean      // 是否只读
+  isConcurrencySafe(input): boolean // 可否并发执行
+  checkPermissions(input, context): Promise&lt;PermissionResult&gt;
+
+  // —— 渲染 ——
+  renderToolUseMessage(input, context): ReactNode   // 工具调用前的UI
+  renderToolResultMessage(content, context): ReactNode // 结果的UI
+
+  // —— 启用 ——
+  isEnabled(): boolean            // 是否当前可用
+}</code></pre>
+
+<h3>5.2 buildTool() 工厂函数</h3>
+<p>位于 <code>Tool.ts:783</code>。为没有显式实现的方法填入安全默认值：</p>
+<ul>
+  <li><code>isEnabled</code> → <code>() => true</code></li>
+  <li><code>isConcurrencySafe</code> → <code>() => false</code>（假设不安全）</li>
+  <li><code>isReadOnly</code> → <code>() => false</code>（假设会写入）</li>
+  <li><code>checkPermissions</code> → 返回 <code>{ behavior: 'allow' }</code>（交给通用权限系统裁决）</li>
+  <li><code>userFacingName</code> → <code>() => def.name</code></li>
+</ul>
+
+<div class="callout info">
+  <div class="callout-title">设计意图</div>
+  buildTool() 让每个工具只需实现核心行为（call、description、inputSchema），其余都有合理默认值。新增一个工具最少只需要约 30 行代码。
+</div>
+
+<h3>5.3 工具注册流程</h3>
+<pre><code>getAllBaseTools()            ← 返回所有内置工具（条件包含）
+    │
+    ▼
+getTools(permissionContext)  ← 按模式和权限过滤
+    │
+    ▼
+assembleToolPool()           ← 合并 MCP 工具，排序，去重
+    │
+    ▼
+toolToAPISchema()            ← 每个 Tool → Anthropic API 格式的 tool schema
+    │
+    ▼
+发送给 LLM                   ← 作为 API 请求的 tools 参数</code></pre>
+
+<h3>5.4 工具示例：FileEditTool</h3>
+<pre><code>// src/tools/FileEditTool/FileEditTool.ts
+export const FileEditTool = buildTool({
+  name: 'file_edit',
+  aliases: ['edit', 'Edit'],
+  searchHint: 'edit a file',
+  isReadOnly: () => false,        // 会修改文件
+  isConcurrencySafe: () => true,  // 不同文件可并发编辑
+  inputSchema: z.object({
+    file_path: z.string(),
+    old_string: z.string(),
+    new_string: z.string(),
+    replace_all: z.boolean().optional()
+  }),
+  async description(input) {
+    return `编辑文件 ${input.file_path}`;
+  },
+  async call(input, context) {
+    // 1. 读取文件
+    // 2. 应用替换
+    // 3. 写入文件
+    // 4. 返回结果
+  }
+});</code></pre>
+
+<h3>5.5 完整工具清单（40+）</h3>
+<table>
+  <tr><th>类别</th><th>工具</th></tr>
+  <tr><td>文件操作</td><td>FileRead, FileEdit, FileWrite, NotebookEdit</td></tr>
+  <tr><td>Shell执行</td><td>Bash, PowerShell</td></tr>
+  <tr><td>代码搜索</td><td>Glob, Grep, ToolSearch</td></tr>
+  <tr><td>Web</td><td>WebFetch, WebSearch</td></tr>
+  <tr><td>Agent管理</td><td>Agent, TaskCreate/Get/List/Update/Stop/Output</td></tr>
+  <tr><td>协作</td><td>SendMessage, TeamCreate, TeamDelete</td></tr>
+  <tr><td>交互</td><td>AskUserQuestion, TodoWrite</td></tr>
+  <tr><td>规划</td><td>EnterPlanMode, ExitPlanMode</td></tr>
+  <tr><td>工作区</td><td>EnterWorktree, ExitWorktree</td></tr>
+  <tr><td>MCP</td><td>MCPTool, ListMcpResources, ReadMcpResource, McpAuth</td></tr>
+  <tr><td>定时</td><td>CronCreate, CronDelete, CronList, Sleep</td></tr>
+  <tr><td>其他</td><td>Skill, LSP, Brief, SyntheticOutput 等</td></tr>
+</table>
+</section>
+
+<!-- ════════════════ 6. API LAYER ════════════════ -->
+<section id="api-layer">
+<h2>六、API 层</h2>
+
+<h3>6.1 架构概览</h3>
+<div class="flow">
+客户端工厂: getAnthropicClient()
+    │
+    ├─ CLAUDE_CODE_USE_BEDROCK  → AWS Bedrock SDK
+    ├─ CLAUDE_CODE_USE_FOUNDRY  → Azure Foundry SDK
+    ├─ CLAUDE_CODE_USE_VERTEX   → Google Vertex AI SDK
+    └─ 默认                     → 标准 Anthropic SDK
+                                      │
+                                      ▼
+                          anthropic.beta.messages.create({
+                            model: 'claude-sonnet-4-6',
+                            messages: [...],
+                            system: [...],
+                            tools: [...],
+                            stream: true,
+                            headers: { ...beta headers }
+                          })</div>
+
+<h3>6.2 关键文件</h3>
+<table>
+  <tr><th>文件</th><th>职责</th></tr>
+  <tr><td><code>services/api/client.ts</code></td><td>客户端工厂：根据环境变量选择Provider</td></tr>
+  <tr><td><code>services/api/claude.ts</code></td><td>构建完整API请求：系统提示词、工具定义、beta头、流式处理</td></tr>
+</table>
+
+<h3>6.3 国产模型适配的关键</h3>
+<div class="callout tip">
+  <div class="callout-title">如何接入国产模型</div>
+  <p>CC 使用 <code>ANTHROPIC_BASE_URL</code> 环境变量可以指向任意兼容端点。国产模型厂商（智谱、阿里、火山）已提供 Anthropic 兼容的 API 端点。CCSwitch 工具就是管理这个配置切换的。</p>
+  <p>也就是说，<strong>你不需要修改 CC 源码</strong>，只需要配置环境变量就能接入国产模型：</p>
+  <pre><code>ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic
+ANTHROPIC_API_KEY=your-zhipu-key
+ANTHROPIC_MODEL=glm-4-plus</code></pre>
+</div>
+</section>
+
+<!-- ════════════════ 7. MCP ════════════════ -->
+<section id="mcp">
+<h2>七、MCP 集成</h2>
+
+<h3>7.1 MCP 协议简介</h3>
+<p>MCP（Model Context Protocol）是一个标准协议，允许外部服务向 AI 模型提供工具。CC 通过 <code>@modelcontextprotocol/sdk</code> 连接 MCP Server，将 MCP 工具透明地注入到工具体系中。</p>
+
+<h3>7.2 架构图</h3>
+<pre><code>CC 工具体系
+    │
+    ├── 内置工具（Bash, FileEdit, Glob...）
+    │
+    └── MCP 工具 ── MCPTool（薄壳）
+                     │
+                     ├── MCP Server 1（Stdio 连接）── tools: [t1, t2, t3]
+                     ├── MCP Server 2（HTTP SSE）    ── tools: [t4, t5]
+                     └── MCP Server 3（WebSocket）   ── tools: [t6]</code></pre>
+
+<h3>7.3 MCPTool 的工作方式</h3>
+<ol>
+  <li><strong>连接阶段</strong>：<code>mcpClient.ts</code> 通过 stdio/HTTP/WebSocket 连接到 MCP Server</li>
+  <li><strong>发现阶段</strong>：调用 <code>tools/list</code> 获取 Server 提供的工具列表</li>
+  <li><strong>注册阶段</strong>：为每个 MCP 工具克隆一个 <code>MCPTool</code> 实例，覆盖 name、description、call、inputSchema</li>
+  <li><strong>调用阶段</strong>：Agent 调用 MCP 工具时，通过 MCP Client 将请求转发给 Server 执行</li>
+</ol>
+
+<h3>7.4 这意味着什么</h3>
+<p>你们要加的 <strong>Godot/Unity MCP 工具</strong>，只需要写一个 MCP Server（独立的 Python/Node 进程），在 CC 的 MCP 配置中注册它，CC 就会自动将它的工具注入到 Agent 中。完全不需要修改 CC 源码。</p>
+
+<div class="callout info">
+  <div class="callout-title">开发路线</div>
+  写 Godot MCP Server → 配置 CC 连接它 → Agent 自动获得游戏引擎工具。CC 源码零改动。
+</div>
+</section>
+
+<!-- ════════════════ 8. PERMISSION ════════════════ -->
+<section id="permission">
+<h2>八、权限系统</h2>
+
+<h3>8.1 权限模式</h3>
+<table>
+  <tr><th>模式</th><th>行为</th></tr>
+  <tr><td><code>default</code></td><td>每个工具调用都弹出交互式权限确认</td></tr>
+  <tr><td><code>acceptEdits</code></td><td>自动批准只读+编辑，破坏性操作需确认</td></tr>
+  <tr><td><code>bypassPermissions</code></td><td>跳过所有权限检查（仅沙箱环境）</td></tr>
+  <tr><td><code>plan</code></td><td>规划模式（模型发起或用户发起）</td></tr>
+  <tr><td><code>auto</code></td><td>Auto 模式，通过分类器自动判断</td></tr>
+</table>
+
+<h3>8.2 权限裁决流程</h3>
+<div class="flow">
+工具调用请求
+    │
+    ▼
+1. 检查拒绝规则 (always-deny rules)
+   ├─ 命中 → 直接拒绝 ✗
+   └─ 未命中 ↓
+    │
+    ▼
+2. 检查允许规则 (always-allow rules)
+   ├─ 命中 → 直接批准 ✓
+   └─ 未命中 ↓
+    │
+    ▼
+3. 分类器自动审批 (仅 Auto 模式的 BashTool)
+    │
+    ▼
+4. 权限钩子 (PermissionRequest hooks)
+    │
+    ▼
+5. 交互式权限弹窗（呈现给用户决定）</div>
+
+<h3>8.3 关键类型</h3>
+<pre><code>type PermissionDecision =
+  | { behavior: 'allow' }           // 允许执行
+  | { behavior: 'deny', reason }    // 拒绝执行
+  | { behavior: 'ask' }             // 需要用户决定
+
+type CanUseToolFn = (
+  tool: Tool,
+  input: Record&lt;string, unknown&gt;,
+  toolUseContext: ToolUseContext,
+  assistantMessage: AssistantMessage
+) => Promise&lt;PermissionDecision&gt;</code></pre>
+</section>
+
+<!-- ════════════════ 9. CONTEXT ════════════════ -->
+<section id="context">
+<h2>九、上下文管理</h2>
+
+<h3>9.1 三层上下文加载</h3>
+<pre><code>用户上下文（getUserContext）
+  ├── CLAUDE.md 文件                              ← 项目行为约定
+  └── MEMORY.md 文件                              ← 跨对话记忆
+    │
+    ▼
+系统上下文（getSystemContext）
+  ├── Git 状态（分支、未提交变更、最近提交）       ← 代码上下文
+  └── cacheBreaker                                ← 缓存控制
+    │
+    ▼
+拼装到系统提示词
+  └── appendSystemContext(systemPrompt, systemContext)</code></pre>
+
+<h3>9.2 性能优化：Memoization</h3>
+<p>Git 状态查询和 CLAUDE.md 读取使用 <code>lodash-es/memoize</code> 缓存——在同一个会话中，相同的请求不会重复读取磁盘。缓存键是 <code>cwd</code>。</p>
+
+<h3>9.3 上下文压缩策略</h3>
+<p>当对话历史过长时，CC 使用多层次压缩：</p>
+<ol>
+  <li><strong>Snip Compact</strong>：微精简——删除冗余内容</li>
+  <li><strong>Microcompact</strong>：合并相邻的相似消息</li>
+  <li><strong>Context Collapse</strong>：总结中间的对话转为摘要</li>
+  <li><strong>Auto-Compact</strong>：自动检测 token 阈值，触发总结</li>
+</ol>
+</section>
+
+<!-- ════════════════ 10. COMMANDS ════════════════ -->
+<section id="commands">
+<h2>十、命令系统</h2>
+
+<h3>10.1 命令的三种类型</h3>
+<table>
+  <tr><th>类型</th><th>行为</th><th>示例</th></tr>
+  <tr><td><code>prompt</code></td><td>将命令文本展开为用户提示词，发给 AI 处理</td><td><code>/review</code>、<code>/security-review</code></td></tr>
+  <tr><td><code>local</code></td><td>本地执行，返回纯文本结果</td><td><code>/cost</code>、<code>/usage</code>、<code>/stats</code></td></tr>
+  <tr><td><code>local-jsx</code></td><td>本地执行，渲染 React/Ink 组件</td><td><code>/status</code>、<code>/doctor</code>、<code>/theme</code></td></tr>
+</table>
+
+<h3>10.2 命令的加载来源（优先级从高到低）</h3>
+<pre>插件命令（已安装的插件）
+  + 捆绑技能（bundled skills）
+  + 技能目录命令（/.claude/skills/）
+  + 工作流脚本（WORKFLOW_SCRIPTS）
+  + MCP 命令（MCP Server 提供）
+  + 内置命令（COMMANDS()）
+  = 完整的命令列表</pre>
+
+<h3>10.3 部分核心命令</h3>
+<table>
+  <tr><th>命令</th><th>功能</th><th>类型</th></tr>
+  <tr><td><code>/model</code></td><td>切换模型</td><td>local</td></tr>
+  <tr><td><code>/compact</code></td><td>压缩上下文</td><td>local</td></tr>
+  <tr><td><code>/review</code></td><td>代码审查</td><td>prompt</td></tr>
+  <tr><td><code>/init</code></td><td>初始化项目 CLAUDE.md</td><td>local-jsx</td></tr>
+  <tr><td><code>/doctor</code></td><td>诊断环境问题</td><td>local-jsx</td></tr>
+  <tr><td><code>/mcp</code></td><td>管理 MCP 服务器</td><td>local-jsx</td></tr>
+  <tr><td><code>/hooks</code></td><td>管理钩子</td><td>local-jsx</td></tr>
+  <tr><td><code>/cost</code></td><td>查看费用</td><td>local</td></tr>
+  <tr><td><code>/memory</code></td><td>管理记忆</td><td>local-jsx</td></tr>
+</table>
+
+<div class="callout info">
+  <div class="callout-title">扩展方式</div>
+  要添加内部专属命令，最干净的方式是写一个 <strong>技能（Skill）</strong> 或者 <strong>插件（Plugin）</strong>，放在 <code>.claude/skills/</code> 目录下。这样完全不修改 CC 源码，也能注入新命令。
+</div>
+</section>
+
+<!-- ════════════════ 11. COORDINATOR ════════════════ -->
+<section id="coordinator">
+<h2>十一、多智能体协调</h2>
+
+<h3>11.1 协调者模式</h3>
+<p>通过 <code>CLAUDE_CODE_COORDINATOR_MODE</code> 环境变量激活。协调者是一个主 Agent，负责：</p>
+<ul>
+  <li>分析任务 → 拆解为子任务</li>
+  <li>生成精确的 worker prompt（包含文件路径、行号、完成条件）</li>
+  <li>分派给 Worker Agent 执行</li>
+  <li>汇总 Worker 结果 → 生成最终输出</li>
+</ul>
+
+<h3>11.2 子 Agent 的三种隔离级别</h3>
+<table>
+  <tr><th>级别</th><th>实现</th><th>用途</th></tr>
+  <tr><td><strong>Fork Agent</strong></td><td>进程内 fork，继承父 Agent 的 prompt cache</td><td>轻量推测、并行搜索</td></tr>
+  <tr><td><strong>Worktree Agent</strong></td><td>创建临时的 git worktree，隔离文件系统</td><td>需要隔离的工作</td></tr>
+  <tr><td><strong>Background Agent</strong></td><td>后台异步执行，结果通过消息返回</td><td>长时间任务</td></tr>
+</table>
+
+<h3>11.3 Fork Agent 的设计精髓</h3>
+<div class="callout tip">
+  <div class="callout-title">零成本上下文共享</div>
+  <p>Fork Agent 继承父 Agent 的 prompt cache。因为父子共享相同的系统提示词前缀，子 Agent 的第一次 API 调用几乎可以零成本加载缓存——这是 CC 多智能体系统最关键的性能设计。</p>
+</div>
+
+<h3>11.4 AgentTool 的关键参数</h3>
+<pre><code>{
+  description: string,      // 子任务的描述
+  prompt: string,           // 发给子 Agent 的完整指令
+  subagent_type: string,    // 子 Agent 类型
+  model?: string,           // 可选模型覆盖
+  run_in_background?: boolean,  // 后台执行
+  isolation?: 'worktree',   // 隔离模式
+  team_name?: string,       // 团队协作
+}</code></pre>
+</section>
+
+<!-- ════════════════ 12. MEMORY ════════════════ -->
+<section id="memory">
+<h2>十二、记忆系统</h2>
+
+<h3>12.1 设计哲学</h3>
+<p>CC 不使用向量数据库，而是使用<strong>文件系统持久化的 Markdown 文件</strong>作为记忆存储。这种设计的优点是：人类可读、Git 可追踪、无需额外基础设施。</p>
+
+<h3>12.2 四类记忆</h3>
+<table>
+  <tr><th>类型</th><th>内容</th><th>文件示例</th></tr>
+  <tr><td><strong>User</strong></td><td>用户角色、偏好、知识背景</td><td><code>user_role.md</code></td></tr>
+  <tr><td><strong>Feedback</strong></td><td>用户对 AI 行为的反馈和纠正</td><td><code>feedback_testing.md</code></td></tr>
+  <tr><td><strong>Project</strong></td><td>项目状态、决策、约束</td><td><code>project_migration.md</code></td></tr>
+  <tr><td><strong>Reference</strong></td><td>外部系统指针（Slack频道、Jira项目等）</td><td><code>ref_linear_project.md</code></td></tr>
+</table>
+
+<h3>12.3 存储位置</h3>
+<pre><code>~/.claude/projects/&lt;项目slug&gt;/memory/
+  ├── MEMORY.md           ← 索引文件（每次对话都加载，最大200行）
+  ├── user_role.md        ← 用户角色记忆
+  ├── feedback_xxx.md     ← 反馈记忆
+  ├── project_xxx.md      ← 项目记忆
+  └── reference_xxx.md    ← 引用记忆</code></pre>
+
+<h3>12.4 安全机制</h3>
+<ul>
+  <li><strong>ENTRYPOINT 截断</strong>：MEMORY.md 最多 200 行 / 25KB，超过就截断</li>
+  <li><strong>漂移保护</strong>：如果记忆与当前代码状态冲突，以当前代码为准</li>
+  <li><strong>5KB+ 自动瘦身</strong>：大的记忆文件会被提示压缩</li>
+  <li><strong>"6个月后还有用吗"过滤器</strong>：防止记忆膨胀</li>
+</ul>
+</section>
+
+<!-- ════════════════ 13. PATTERNS ════════════════ -->
+<section id="patterns">
+<h2>十三、关键设计模式</h2>
+
+<h3>13.1 8 种 Agent 设计模式</h3>
+<p>社区分析从 CC 源码中提取了以下核心设计模式：</p>
+<table>
+  <tr><th>#</th><th>模式</th><th>一句话描述</th></tr>
+  <tr><td>1</td><td><strong>协调者编排</strong></td><td>主 Agent 将任务拆解为带精确指令（文件路径+行号）的子任务</td></tr>
+  <tr><td>2</td><td><strong>任务并发</strong></td><td>读任务并行执行，写操作串行化；AsyncLocalStorage 隔离</td></tr>
+  <tr><td>3</td><td><strong>对抗性验证</strong></td><td>"试试能不能破坏它"心态；不接受"看起来正确"的结论</td></tr>
+  <tr><td>4</td><td><strong>自我合理化防护</strong></td><td>Agent CBT——"如果你在解释而不是运行命令，停下来"</td></tr>
+  <tr><td>5</td><td><strong>Worker Prompt 工艺</strong></td><td>自包含指令——包含路径、行号、完成标准</td></tr>
+  <tr><td>6</td><td><strong>记忆类型系统</strong></td><td>4类记忆 + 索引 + 安全机制</td></tr>
+  <tr><td>7</td><td><strong>智能记忆守卫</strong></td><td>漂移保护、5KB 自动瘦身、"6个月后还有用吗"过滤器</td></tr>
+  <tr><td>8</td><td><strong>轻量探索器</strong></td><td>只读、快速、低成本；并行独立搜索</td></tr>
+</table>
+
+<h3>13.2 工程模式</h3>
+<table>
+  <tr><th>模式</th><th>CC 中的应用</th></tr>
+  <tr><td><strong>工厂函数</strong></td><td><code>buildTool()</code> 为工具填入安全默认值，减少样板代码</td></tr>
+  <tr><td><strong>生成器函数</strong></td><td>流式 API 响应、工具执行、查询回路——全部使用 <code>function*</code> / <code>async function*</code></td></tr>
+  <tr><td><strong>延迟加载</strong></td><td><code>cli.tsx</code> 快速路径零模块加载；重型模块（OpenTelemetry、gRPC）按需加载</td></tr>
+  <tr><td><strong>Memoization</strong></td><td>Git 状态、命令列表、CLAUDE.md 等 I/O 密集型路径使用 memoize 缓存</td></tr>
+  <tr><td><strong>编译时死代码消除</strong></td><td><code>bun:bundle</code> 的 <code>feature()</code> 在编译时剔除内部功能</td></tr>
+  <tr><td><strong>分层权限</strong></td><td>配置规则 → 工���自查 → AI 分类器 → 用户确认，多层并发竞速</td></tr>
+</table>
+</section>
+
+<!-- ════════════════ 14. SUMMARY ════════════════ -->
+<section id="summary">
+<h2>十四、总结：一次对话的完整数据流</h2>
+
+<div class="flow">
+用户在终端输入： "帮我修一下 login.ts 里的空指针异常"
+    │
+    ▼
+main.tsx → launchRepl() → Ink UI 渲染输入框
+    │
+    ▼
+QueryEngine.submitMessage(userInput)
+    │
+    ├── 构建系统提示词：
+    │   ├── 用户上下文（CLAUDE.md + MEMORY.md）
+    │   └── 系统上下文（Git 状态）
+    │
+    ├── processUserInput() 解析（没有斜杠命令 → 纯 prompt）
+    │
+    ▼
+queryLoop() 开始 ←─────────────────────────────┐
+    │                                           │
+    ├── 1. 准备消息列表                          │
+    ├── 2. 检查是否需要 compact                  │
+    ├── 3. 构建 API 请求 ── claude.ts            │
+    │     ├── model: 'claude-sonnet-4-6'         │
+    │     ├── system: [系统提示词]                │
+    │     ├── messages: [对话历史 + 用户输入]     │
+    │     └── tools: [40+工具 JSON Schema]       │
+    │                                           │
+    ├── 4. 流式接收 API 响应                     │
+    │     content_block_delta: "我来帮你..."       │
+    │     content_block_start: { type: tool_use,  │
+    │       name: 'file_read',                   │
+    │       input: { file_path: 'login.ts' } }   │
+    │                                           │
+    ├── 5. 执行工具 ── runTools()                 │
+    │     ├── 权限检查：允许读文件 ✓              │
+    │     ├── FileReadTool.call()                │
+    │     └── 结果：login.ts 的 82-95 行内容     │
+    │                                           │
+    ├── 6. 工具结果追加到消息，继续循环           │
+    │     │                                      │
+    │     └── 下一轮 API 调用返回 tool_use:       │
+    │           { name: 'file_edit',             │
+    │             input: { old_string: ...,      │
+    │                      new_string: ... } }   │
+    │                                           │
+    ├── 7. 再次执行工具（编辑文件）               │
+    │                                           │
+    ├── 8. 模型返回 stop_reason: 'end_turn'      │
+    │     → 退出循环 ────────────────────────────┘
+    │
+    ▼
+submitMessage() 产出最终结果
+    │
+    ▼
+Ink UI 渲染响应（Markdown + 工具调用卡片 + diff 预览）
+    │
+    ▼
+用户看到结果</div>
+
+<p style="margin-top:24px;">这就是 Claude Code 一次完整对话的端到端流程。理解了这张图，就理解了整个系统的运作方式。</p>
+</section>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer>
+<p>基于 Claude Code 源码快照（2026-03-31 泄露版本）分析整理</p>
+<p style="color:var(--text-dim);margin-top:8px;">仅供教育、安全研究和架构学习之用</p>
+</footer>
+
+</div>
+</body>
+</html>
