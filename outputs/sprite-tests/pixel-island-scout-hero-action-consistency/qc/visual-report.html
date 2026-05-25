@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>主角跨动作一致性验收看板</title>
+  <style>
+    :root {
+      --bg: #141a1f;
+      --panel: #1c242b;
+      --panel-2: #222c34;
+      --line: #34414a;
+      --text: #eef2f2;
+      --muted: #a8b4b7;
+      --teal: #32c5ba;
+      --coral: #f18767;
+      --gold: #f2c66e;
+      --green: #45bd7b;
+      --danger: #e25f61;
+      --checker-a: #232d35;
+      --checker-b: #29343c;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    main {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 28px 28px 36px;
+      display: grid;
+      gap: 18px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 22px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 650;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .result {
+      min-width: 242px;
+      padding: 12px 14px;
+      border: 1px solid rgba(69, 189, 123, 0.42);
+      border-radius: var(--radius);
+      background: rgba(69, 189, 123, 0.08);
+    }
+
+    .result-label,
+    .section-kicker {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .result-value {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      color: #b7efcd;
+      font-size: 20px;
+      font-weight: 650;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .result-note {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .panel {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 3px 0 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .panel-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .action-card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+
+    .action-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 11px 9px;
+    }
+
+    .action-name {
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    .passed {
+      padding: 3px 7px;
+      border: 1px solid rgba(69, 189, 123, 0.36);
+      border-radius: 5px;
+      color: #a5e7bf;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .media-frame {
+      height: 190px;
+      margin: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #303c45;
+      border-radius: 6px;
+      background-color: var(--checker-a);
+      background-image:
+        linear-gradient(45deg, var(--checker-b) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--checker-b) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--checker-b) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--checker-b) 75%);
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      background-size: 20px 20px;
+    }
+
+    .media-frame img {
+      width: 176px;
+      height: 176px;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .switch {
+      display: flex;
+      gap: 4px;
+      padding: 9px 10px 5px;
+    }
+
+    .switch button {
+      flex: 1;
+      height: 28px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: transparent;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .switch button[aria-pressed="true"] {
+      color: var(--text);
+      border-color: rgba(50, 197, 186, 0.45);
+      background: rgba(50, 197, 186, 0.13);
+    }
+
+    .action-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 9px 10px 13px;
+      gap: 8px;
+    }
+
+    .metric-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .metric-value {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .quant-grid {
+      display: grid;
+      grid-template-columns: 1.55fr 0.95fr;
+      gap: 14px;
+    }
+
+    .height-chart {
+      display: grid;
+      gap: 14px;
+      padding-top: 6px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 68px 1fr 72px 76px;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .bar-track {
+      position: relative;
+      height: 16px;
+      border-radius: 4px;
+      background: #27323a;
+      overflow: hidden;
+    }
+
+    .bar-track::before {
+      content: "";
+      position: absolute;
+      left: 85%;
+      top: 0;
+      bottom: 0;
+      border-left: 1px dashed rgba(242, 198, 110, 0.9);
+      z-index: 2;
+    }
+
+    .bar {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--teal);
+    }
+
+    .bar.attack { background: var(--coral); }
+    .bar.hurt { background: var(--gold); }
+
+    .delta {
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .threshold {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .dash {
+      width: 17px;
+      border-top: 1px dashed var(--gold);
+    }
+
+    .qc-list {
+      display: grid;
+      gap: 9px;
+      margin-top: 5px;
+    }
+
+    .qc-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel-2);
+    }
+
+    .qc-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .qc-value {
+      color: #ade9c5;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .closing {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .finding {
+      min-height: 104px;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .finding.boundary {
+      border-left: 3px solid var(--coral);
+    }
+
+    .finding.keep {
+      border-left: 3px solid var(--teal);
+    }
+
+    .finding h3 {
+      margin: 0 0 9px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    footer a {
+      color: #87ded7;
+      text-decoration: none;
+    }
+
+    @media (max-width: 980px) {
+      main { padding: 18px; }
+      header,
+      .closing { display: grid; }
+      .actions,
+      .quant-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      .actions,
+      .quant-grid,
+      .closing { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 58px 1fr 64px; }
+      .bar-row .delta { grid-column: 2 / 4; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <div class="section-kicker">Sprite Forge / Hero Action Consistency</div>
+        <h1>主角跨动作一致性验收</h1>
+        <p class="subtitle">海岛侦察员角色 · Idle / Walk / Attack / Hurt · 固定格动作包</p>
+      </div>
+      <div class="result">
+        <div class="result-label">最终判定</div>
+        <div class="result-value"><span class="status-dot"></span>通过，存在动作边界</div>
+        <div class="result-note">攻击采用近身下劈以满足固定格边界</div>
+      </div>
+    </header>
+
+    <section class="panel">
+      <div class="panel-title">
+        <div>
+          <div class="section-kicker">Visual Assets</div>
+          <h2>最终动作素材</h2>
+        </div>
+        <div class="panel-note">切换查看透明精灵表或动画预览</div>
+      </div>
+      <div class="actions">
+        <article class="action-card" data-action="idle">
+          <div class="action-head"><span class="action-name">IDLE</span><span class="passed">PASS</span></div>
+          <div class="media-frame"><img src="../accepted/idle/animation.gif" alt="Idle 动画预览"></div>
+          <div class="switch">
+            <button type="button" data-kind="gif" aria-pressed="true">动画</button>
+            <button type="button" data-kind="sheet" aria-pressed="false">精灵表</button>
+          </div>
+          <div class="action-stats">
+            <div><span class="metric-label">平均高度</span><span class="metric-value">108 px</span></div>
+            <div><span class="metric-label">偏差</span><span class="metric-value">0.00%</span></div>
+            <div><span class="metric-label">越界</span><span class="metric-value">0</span></div>
+          </div>
+        </article>
+        <article class="action-card" data-action="walk">
+          <div class="action-head"><span class="action-name">WALK</span><span class="passed">PASS</span></div>
+          <div class="media-frame"><img src="../accepted/walk/animation.gif" alt="Walk 动画预览"></div>
+          <div class="switch">
+            <button type="button" data-kind="gif" aria-pressed="true">动画</button>
+            <button type="button" data-kind="sheet" aria-pressed="false">精灵表</button>
+          </div>
+          <div class="action-stats">
+            <div><span class="metric-label">平均高度</span><span class="metric-value">108 px</span></div>
+            <div><span class="metric-label">偏差</span><span class="metric-value">0.00%</span></div>
+            <div><span class="metric-label">越界</span><span class="metric-value">0</span></div>
+          </div>
+        </article>
+        <article class="action-card" data-action="attack">
+          <div class="action-head"><span class="action-name">ATTACK</span><span class="passed">PASS</span></div>
+          <div class="media-frame"><img src="../accepted/attack/animation.gif" alt="Attack 动画预览"></div>
+          <div class="switch">
+            <button type="button" data-kind="gif" aria-pressed="true">动画</button>
+            <button type="button" data-kind="sheet" aria-pressed="false">精灵表</button>
+          </div>
+          <div class="action-stats">
+            <div><span class="metric-label">平均高度</span><span class="metric-value">105.5 px</span></div>
+            <div><span class="metric-label">偏差</span><span class="metric-value">-2.31%</span></div>
+            <div><span class="metric-label">越界</span><span class="metric-value">0</span></div>
+          </div>
+        </article>
+        <article class="action-card" data-action="hurt">
+          <div class="action-head"><span class="action-name">HURT</span><span class="passed">PASS</span></div>
+          <div class="media-frame"><img src="../accepted/hurt/animation.gif" alt="Hurt 动画预览"></div>
+          <div class="switch">
+            <button type="button" data-kind="gif" aria-pressed="true">动画</button>
+            <button type="button" data-kind="sheet" aria-pressed="false">精灵表</button>
+          </div>
+          <div class="action-stats">
+            <div><span class="metric-label">平均高度</span><span class="metric-value">103.75 px</span></div>
+            <div><span class="metric-label">偏差</span><span class="metric-value">-3.94%</span></div>
+            <div><span class="metric-label">越界</span><span class="metric-value">0</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="quant-grid">
+      <article class="panel">
+        <div class="panel-title">
+          <div>
+            <div class="section-kicker">Size Comparison</div>
+            <h2>平均角色高度对比</h2>
+          </div>
+          <div class="panel-note">以 IDLE 108 px 为基准</div>
+        </div>
+        <div class="height-chart">
+          <div class="bar-row"><strong>IDLE</strong><div class="bar-track"><div class="bar" style="width:100%"></div></div><span>108.00 px</span><span class="delta">0.00%</span></div>
+          <div class="bar-row"><strong>WALK</strong><div class="bar-track"><div class="bar" style="width:100%"></div></div><span>108.00 px</span><span class="delta">0.00%</span></div>
+          <div class="bar-row"><strong>ATTACK</strong><div class="bar-track"><div class="bar attack" style="width:97.69%"></div></div><span>105.50 px</span><span class="delta">-2.31%</span></div>
+          <div class="bar-row"><strong>HURT</strong><div class="bar-track"><div class="bar hurt" style="width:96.06%"></div></div><span>103.75 px</span><span class="delta">-3.94%</span></div>
+        </div>
+        <div class="threshold"><span class="dash"></span>允许下限：基准高度 -15%</div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-title">
+          <div>
+            <div class="section-kicker">QC Checks</div>
+            <h2>一致性检查</h2>
+          </div>
+        </div>
+        <div class="qc-list">
+          <div class="qc-item"><span class="qc-label">身份与服装标记</span><span class="qc-value">通过</span></div>
+          <div class="qc-item"><span class="qc-label">像素风格一致性</span><span class="qc-value">通过</span></div>
+          <div class="qc-item"><span class="qc-label">脚底基准线</span><span class="qc-value">119 px · 全部一致</span></div>
+          <div class="qc-item"><span class="qc-label">跨格 / 贴边帧</span><span class="qc-value">0 帧</span></div>
+        </div>
+      </article>
+    </section>
+    <section class="closing">
+      <article class="finding boundary">
+        <h3>动作边界</h3>
+        <p>原横向长突刺会跨出当前固定单元格。最终 ATTACK 改为紧凑近身下劈后通过验收。<br>如必须保留长突刺：扩大攻击格，或定义独立的攻击导出规格。</p>
+      </article>
+      <article class="finding keep">
+        <h3>本次沉淀</h3>
+        <p>以已通过的 IDLE 作为身份基准后，四组最终动作能够同时满足角色识别、尺寸容差、脚底对齐与透明切帧要求。</p>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">
+        <div>
+          <div class="section-kicker">Latest Boundary Extension</div>
+          <h2>横向长突刺宽帧能力补充</h2>
+        </div>
+        <div class="panel-note">与最新结果同步更新</div>
+      </div>
+      <div class="quant-grid">
+        <article class="panel" style="margin:0;">
+          <div class="panel-title">
+            <div>
+              <div class="section-kicker">Wide Attack</div>
+              <h2>ATTACK - LONG THRUST</h2>
+            </div>
+            <div class="panel-note">224 x 128 · Pivot 112,119</div>
+          </div>
+          <div class="media-frame" style="height:224px;">
+            <img data-wide-preview src="../../pixel-island-scout-hero-wide-thrust/attack-long-thrust/processed/animation.gif" alt="宽帧长突刺动画预览" style="width:300px;height:auto;">
+          </div>
+          <div class="switch">
+            <button type="button" data-wide-kind="gif" aria-pressed="true">动画</button>
+            <button type="button" data-wide-kind="sheet" aria-pressed="false">精灵表</button>
+          </div>
+        </article>
+        <article class="panel" style="margin:0;">
+          <div class="panel-title">
+            <div>
+              <div class="section-kicker">Boundary Data</div>
+              <h2>最新数值</h2>
+            </div>
+          </div>
+          <div class="qc-list">
+            <div class="qc-item"><span class="qc-label">平均高度</span><span class="qc-value">101.75 px</span></div>
+            <div class="qc-item"><span class="qc-label">相对 IDLE 偏差</span><span class="qc-value">-5.79%</span></div>
+            <div class="qc-item"><span class="qc-label">最大轮廓宽度</span><span class="qc-value">150 px / 224 px 宽帧</span></div>
+            <div class="qc-item"><span class="qc-label">源格越界 / 输出裁切</span><span class="qc-value">0 帧 / 0 帧</span></div>
+            <div class="qc-item"><span class="qc-label">输出资源</span><span class="qc-value">GIF · 单帧 · 透明表 · 元数据</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <span>测试补充输出 · 用于可视化验收，不替代项目标准动作素材目录</span>
+      <span><a href="final-report.json">结构化结论</a> · <a href="automated-measures-final.json">测量数据</a> · <a href="../../pixel-island-scout-hero-wide-thrust/qc/wide-thrust-report.json">宽帧报告</a></span>
+    </footer>
+  </main>
+  <script>
+    const sources = {
+      idle: { gif: "../accepted/idle/animation.gif", sheet: "../accepted/idle/sheet-transparent.png" },
+      walk: { gif: "../accepted/walk/animation.gif", sheet: "../accepted/walk/sheet-transparent.png" },
+      attack: { gif: "../accepted/attack/animation.gif", sheet: "../accepted/attack/sheet-transparent.png" },
+      hurt: { gif: "../accepted/hurt/animation.gif", sheet: "../accepted/hurt/sheet-transparent.png" }
+    };
+
+    const wideSources = {
+      gif: "../../pixel-island-scout-hero-wide-thrust/attack-long-thrust/processed/animation.gif",
+      sheet: "../../pixel-island-scout-hero-wide-thrust/attack-long-thrust/processed/sheet-transparent.png"
+    };
+
+    document.querySelectorAll(".action-card").forEach((card) => {
+      const action = card.dataset.action;
+      const image = card.querySelector("img");
+      card.querySelectorAll("button[data-kind]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const kind = button.dataset.kind;
+          image.src = sources[action][kind];
+          image.alt = `${action.toUpperCase()} ${kind === "gif" ? "动画预览" : "透明精灵表"}`;
+          card.querySelectorAll("button[data-kind]").forEach((choice) => {
+            choice.setAttribute("aria-pressed", String(choice === button));
+          });
+        });
+      });
+    });
+
+    const wideImage = document.querySelector("[data-wide-preview]");
+    if (wideImage) {
+      document.querySelectorAll("button[data-wide-kind]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const kind = button.dataset.wideKind;
+          wideImage.src = wideSources[kind];
+          wideImage.alt = `宽帧长突刺${kind === "gif" ? "动画预览" : "透明精灵表"}`;
+          document.querySelectorAll("button[data-wide-kind]").forEach((choice) => {
+            choice.setAttribute("aria-pressed", String(choice === button));
+          });
+        });
+      });
+    }
+  </script>
+</body>
+</html>

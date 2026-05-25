@@ -1,0 +1,113 @@
+{
+  "baseline": "idle",
+  "tested_set": [
+    "idle",
+    "walk",
+    "attack",
+    "hurt"
+  ],
+  "actions": {
+    "idle": {
+      "height_px": [
+        108,
+        108,
+        108,
+        108
+      ],
+      "width_px": [
+        78,
+        83,
+        79,
+        83
+      ],
+      "mean_height_px": 108,
+      "height_deviation_from_idle_percent": 0.0,
+      "bottom_anchor_px": [
+        119,
+        119,
+        119,
+        119
+      ],
+      "bottom_anchor_range_px": 0,
+      "edge_touch_frames": []
+    },
+    "walk": {
+      "height_px": [
+        108,
+        108,
+        108,
+        108
+      ],
+      "width_px": [
+        78,
+        82,
+        81,
+        76
+      ],
+      "mean_height_px": 108,
+      "height_deviation_from_idle_percent": 0.0,
+      "bottom_anchor_px": [
+        119,
+        119,
+        119,
+        119
+      ],
+      "bottom_anchor_range_px": 0,
+      "edge_touch_frames": []
+    },
+    "attack": {
+      "height_px": [
+        108,
+        108,
+        98,
+        108
+      ],
+      "width_px": [
+        78,
+        72,
+        76,
+        78
+      ],
+      "mean_height_px": 105.5,
+      "height_deviation_from_idle_percent": -2.31,
+      "bottom_anchor_px": [
+        119,
+        119,
+        119,
+        119
+      ],
+      "bottom_anchor_range_px": 0,
+      "edge_touch_frames": []
+    },
+    "hurt": {
+      "height_px": [
+        108,
+        100,
+        99,
+        108
+      ],
+      "width_px": [
+        82,
+        81,
+        82,
+        80
+      ],
+      "mean_height_px": 103.75,
+      "height_deviation_from_idle_percent": -3.94,
+      "bottom_anchor_px": [
+        119,
+        119,
+        119,
+        119
+      ],
+      "bottom_anchor_range_px": 0,
+      "edge_touch_frames": []
+    }
+  },
+  "checks": {
+    "height_tolerance_percent": 15,
+    "all_height_means_within_tolerance": true,
+    "all_frames_clear_of_cell_edges": true,
+    "all_actions_bottom_aligned": true
+  }
+}

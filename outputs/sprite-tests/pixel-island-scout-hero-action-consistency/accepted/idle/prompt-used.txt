@@ -1,0 +1,13 @@
+Use the tropical island image shown in the conversation as the theme reference only: turquoise water, warm sand, palm leaves, wooden docks, coral orange accents, cheerful island adventure mood. Create a 2x2 animation sprite sheet for one original top-down 3/4 pixel-art player character idle loop, suitable for a polished mobile roguelite action game. Do not copy any existing game character.
+
+Subject: a young island scout hero. Distinctive design: teal short explorer cape, coral-orange scarf, shell compass necklace, rolled map tube on the back, small driftwood staff held close to the body, sandy beige shorts, turquoise bead bracelets, soft boots. Readable at small game scale.
+
+Style: refined pixel art, crisp dark outline, hand-placed pixel clusters, bright saturated tropical palette, compact chibi body proportions, clean readable silhouette, subtle highlight pixels, polished game sprite quality. Top-down 3/4 view from slightly above, full body visible, character faces slightly toward the camera. Feet stay on the same bottom anchor line.
+
+Animation: 4-frame idle loop in a 2x2 grid. Subtle breathing bounce, scarf and cape shift slightly, staff moves gently but stays close to the body. Same character identity, same costume, same palette, same proportions in every frame.
+
+Sheet requirements: EXACTLY 2 rows by 2 columns, four equal square cells, no visible borders or dividers. One complete full-body character centered in each cell. Full body inside central 60% to 70% safe area with generous magenta margin. Consistent scale and bounding box across all frames. Nothing may touch or cross cell edges.
+
+Background: 100% solid flat #FF00FF magenta in every cell, no gradient, no texture, no ground plane, no shadow.
+
+Avoid: 3D render, smooth vector art, painterly style, anime portrait, photorealism, text, watermark, labels, frame numbers, UI, extra characters, wide detached effects, dust clouds, weapons or cape crossing cell edges.

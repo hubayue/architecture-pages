@@ -1,0 +1,39 @@
+{
+  "test": "hero_action_identity_size_style_consistency",
+  "status": "passed_with_constraint",
+  "summary_zh": "最新复测已通过。主角在 idle、walk、attack、hurt 之间保持身份、像素风格、尺寸级别与脚底对齐；边界条件是 attack 采用紧凑近身下劈动作。",
+  "accepted_actions": {
+    "idle": "../accepted/idle",
+    "walk": "../accepted/walk",
+    "attack": "../accepted/attack",
+    "hurt": "../accepted/hurt"
+  },
+  "final_checks": {
+    "identity_consistency": "pass",
+    "style_consistency": "pass",
+    "size_consistency_within_15_percent": "pass",
+    "bottom_anchor_alignment": "pass",
+    "edge_touch": "pass"
+  },
+  "measurements": {
+    "idle_mean_height_px": 108.0,
+    "walk_height_deviation_percent": 0.0,
+    "attack_height_deviation_percent": -2.31,
+    "hurt_height_deviation_percent": -3.94,
+    "bottom_anchor_px_all_frames": 119,
+    "edge_touch_frames_all_accepted_actions": []
+  },
+  "boundary_zh": "原先外观忠实的横向长突刺动作无法在当前固定单元格内保持完整边界；最终通过版本改用近身下劈。若必须保留横向长突刺，应扩大攻击单元格或定义单独的攻击导出规格。",
+  "history_summary_zh": [
+    "第一次测试中，外观接近基准角色的 attack 因横向武器延伸而越界。",
+    "为修复越界生成的替换 attack 产生角色身份漂移，因此第一次测试判定失败。",
+    "第二次测试强化身份锁定并收紧攻击运动范围，最终 attack 与 hurt 同时通过身份和工程检查。"
+  ],
+  "retained_qc_artifacts": {
+    "visual_summary": "visual-summary-final.png",
+    "interactive_visual_report": "visual-report.html",
+    "visual_comparison": "action-comparison-final.png",
+    "automated_measurements": "automated-measures-final.json"
+  },
+  "cleanup_zh": "失败样本、中间候选和第一次失败报告已在结论固化后移除，最终目录只保留通过素材与最终质检结果。"
+}

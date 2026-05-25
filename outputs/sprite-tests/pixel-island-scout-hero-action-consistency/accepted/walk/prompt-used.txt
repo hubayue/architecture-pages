@@ -1,0 +1,13 @@
+Use the visible transparent idle sprite sheet immediately above as the exact identity and style reference. Create an animation sheet for the same island scout hero, changing only the action into a short downward walk loop.
+
+Preserve identity exactly: tousled dark-brown hair with the same silhouette, large warm eyes and face proportions, short teal explorer cape, coral-orange scarf, shell compass necklace, rolled map tube over one shoulder, small carved driftwood staff held close to the body, sandy beige shorts, turquoise bead accents, and brown soft boots. Do not redesign, age, restyle, recolor, or add equipment.
+
+Style: refined modern pixel art matching the visible idle sheet, crisp dark outline, hand-placed pixel clusters, bright tropical teal/coral/sand palette, compact chibi top-down 3/4 game sprite. Same pixel density, lighting language, outline weight, and body scale as the accepted idle reference.
+
+Animation: a four-frame downward walk cycle facing slightly toward the camera: contact, passing, opposite contact, passing. Legs and cape move modestly; scarf bobs slightly; staff stays close to the torso; rolled map tube remains visible. Feet remain on a stable bottom anchor line.
+
+Sheet requirements: EXACTLY 2 rows by 2 columns with four equal square cells and no visible dividers. One complete full-body hero centered in every cell. The hero must match the accepted idle body height and scale, remaining inside the central 60% to 70% safe area with generous magenta gutters. Consistent bounding box across frames. No body part, staff, scarf, cape, or accessory may touch or cross a cell edge.
+
+Background: 100% solid flat #FF00FF magenta in every cell, no texture, no gradient, no shadow, no ground plane.
+
+Avoid: 3D render, smooth vector art, painterly shading, high-resolution illustration, text, labels, watermark, UI, extra characters, running leap, dust, trails, detached effects, changed costume or changed facial identity.

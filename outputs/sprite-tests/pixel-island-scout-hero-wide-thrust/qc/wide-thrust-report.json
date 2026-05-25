@@ -1,0 +1,37 @@
+{
+  "test": "hero_long_horizontal_thrust_wide_cell_boundary",
+  "status": "passed_asset_export_with_runtime_integration_followup",
+  "summary_zh": "横向长突刺动作已在不改成紧凑攻击的情况下完成透明宽帧导出，证明工作流可通过独立宽攻击格承载该动作类型。",
+  "baseline": {
+    "source": "../../pixel-island-scout-hero-action-consistency/accepted/idle",
+    "frame_size_px": [128, 128],
+    "body_height_reference_px": 108
+  },
+  "wide_attack": {
+    "source": "../attack-long-thrust/processed",
+    "action": "horizontal_staff_thrust",
+    "frame_count": 4,
+    "frame_size_px": [224, 128],
+    "sheet_size_px": [448, 256],
+    "runtime_pivot_image_space": {
+      "normalized_top_left_origin": [0.5, 0.9296875],
+      "pixels_top_left_origin": [112, 119]
+    },
+    "body_or_silhouette_height_px": [108, 97, 94, 108],
+    "mean_height_px": 101.75,
+    "mean_height_deviation_from_idle_percent": -5.79,
+    "max_silhouette_width_px": 150,
+    "source_edge_touch_frames": [],
+    "output_edge_touch_frames": []
+  },
+  "visual_findings_zh": [
+    "保留了棕色层叠发型、贝壳发饰、青绿色眼睛、珊瑚围巾、青绿披风、卷轴筒与朴素弯木杖。",
+    "第二、三帧保留明显的横向伸杖突刺姿态，不再以近身下劈替代。",
+    "突刺阶段的高度降低来自前倾与压低重心的姿态变化；起手和收势帧仍为 108 px 基准高度。"
+  ],
+  "capability_boundary_zh": {
+    "now_supported": "处理器已支持矩形帧交付、统一运行时 Pivot 记录，以及宽动作中防止武器轮廓导致本体被重新居中的对齐方式。",
+    "not_yet_proven": "尚未在 Unity 或 Godot 场景内实际播放并验证 Pivot 转换、攻击命中区域和状态切换。"
+  },
+  "next_validation_zh": "下一步应将该宽帧 attack 与标准 idle/walk/hurt 一并导入一个最小 Unity 或 Godot 场景，验证播放切换不抖动并绑定独立攻击判定框。"
+}

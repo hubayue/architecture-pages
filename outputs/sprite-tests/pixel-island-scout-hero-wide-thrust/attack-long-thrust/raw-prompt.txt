@@ -1,0 +1,11 @@
+Use the visible accepted IDLE sprite sheet as the canonical identity reference and the user's earlier long-thrust ATTACK image as the requested motion reference. Create a four-frame horizontal long-thrust staff ATTACK animation for exactly the same island scout hero.
+
+Identity is non-negotiable: warm chestnut-brown layered tousled hair, cream shell hair ornament with turquoise and coral beads on the right side, large turquoise eyes, coral-orange scarf, short turquoise cape with cream trim and white shell mark, round shell compass pendant, rolled map tube, sandy cream shorts, turquoise bead accents, brown boots, and the same plain crooked natural driftwood staff. No ornate spiral staff, no new weapon, no changed hairstyle, no changed costume marks.
+
+Style is locked to the accepted hero: refined modern pixel art, crisp dark outline, controlled hand-placed clusters, bright tropical teal/coral/sand palette, top-down 3/4 chibi game sprite, same apparent pixel density and scale.
+
+Motion: a body-attached long weapon attack, not a compact substitute. Four readable phases: upright anticipation with staff raised above the boot line; committed two-hand horizontal forward thrust with the crooked staff clearly projecting to the left; extended follow-through with strong forward reach; recovery returning toward ready. Keep the hero's feet and torso centered on the same invisible body axis in all four cells; the staff may extend horizontally, but it must stay above the soles so the feet remain the bottom anchor. No slash arc, no impact burst, no detached FX, no dust, no shadow.
+
+Raw generation layout: EXACTLY 2 rows by 2 columns, four equal square source cells on perfectly flat solid #FF00FF magenta. Because this will be normalized into wider delivery frames, render the hero slightly smaller within each raw source cell than the idle reference and leave unusually generous magenta margins on the left and right. The full staff thrust and cape must be completely contained inside its own source cell; no pixel may touch or cross a source-cell boundary. No text, labels, dividers, watermark, UI, or extra characters.
+
+Delivery intent: this raw grid will be postprocessed as four `224 x 128` transparent frames using a fixed feet/body pivot, so do not shorten the intended horizontal thrust merely to imitate a normal square action frame.

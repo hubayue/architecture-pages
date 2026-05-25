@@ -1,0 +1,9 @@
+Use the visible accepted IDLE sprite and faithful first ATTACK candidate as exact character model sheets. Generate a corrected contained ATTACK animation for the same hero, with absolutely no change to the character design.
+
+Non-negotiable identity marks: warm chestnut spiky layered hair; cream shell hair clip with small turquoise and coral beads; large turquoise eyes; coral scarf; short turquoise cape with cream border and small white shell emblem; round shell compass pendant; rolled map tube on the back; cream shorts; turquoise bead accents; brown boots. The weapon is the same plain natural driftwood walking staff: a simple brown crooked hook branch, not ornate, not spiral, not magical, no metal head, no new carvings.
+
+Match the reference pixel-art treatment exactly: same apparent resolution, outline thickness, warm shading, color palette, proportions, and top-down 3/4 view.
+
+Create EXACTLY four frames in a 2x2 grid: ready with vertical crooked staff beside the body; compact raised-staff wind-up; short downward/diagonal close-body strike with the crooked staff still mostly vertical; return to ready. Never pose the staff horizontally across a large distance and never enlarge it. This is an attack read through posture, not a long reach.
+
+Strict layout: solid perfectly flat pure #FF00FF background; four equal cells; no borders or dividers; one full-body hero centered in each cell with large empty magenta margins. The hero, cape, crooked staff, and accessories must remain entirely inside their own cell and must not touch any boundary. Keep IDLE body size and one stable bottom anchor. Body only, no slash arc, trail, impact, sparkle, dust, shadow, additional character, UI, text, watermark, or extra equipment.

@@ -1,0 +1,9 @@
+Use the visible accepted transparent IDLE sprite sheet as the strict canonical character reference. Create a corrected HURT animation sheet for exactly the same island scout hero, changing only posture and expression for a brief recoil.
+
+Identity must stay locked frame by frame: medium chestnut-brown tousled layered hair with the same large silhouette, cream shell hair ornament plus turquoise and coral beads on the right side, large turquoise eyes, coral-orange scarf, short turquoise cape with cream edging and white shell mark, shell compass medallion, rolled map tube, sandy cream shorts, turquoise ankle/bead details, brown boots, and simple curved driftwood staff held close. Do not alter the hairstyle, face proportions, hair accessory, staff shape, costume marks, palette, or apparent age.
+
+Style: refined modern pixel art identical to the IDLE sheet: crisp dark outline, hand-placed pixel clusters, warm tropical palette, compact top-down 3/4 chibi proportions, identical pixel density and lighting language.
+
+Animation: four-frame restrained hurt/recoil loop in a 2x2 grid: small flinch, short recoil with eyes closed, settling pose, return toward ready. The hero remains readable as the same sprite; no exaggerated distortion. Keep body scale matching IDLE and feet on one stable bottom anchor.
+
+Critical constraints: body-only action, no stars, no impact burst, no blood, no particles, no shadows, no detached FX. EXACTLY 2 rows by 2 columns, four equal square cells with no visible dividers. One complete full-body character in each cell, centered with generous gutters, no pixel may touch or cross a cell edge. Perfectly flat pure #FF00FF magenta background only. No labels, text, watermark, UI, extra characters, or added equipment.

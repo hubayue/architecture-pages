@@ -1,0 +1,193 @@
+{
+  "target": "asset",
+  "mode": "attack",
+  "prompt": "",
+  "role": "",
+  "input": "outputs\\sprite-tests\\pixel-island-scout-hero-wide-thrust\\attack-long-thrust\\raw-sheet.png",
+  "threshold": 100,
+  "edge_threshold": 150,
+  "duration": 110,
+  "rows": 2,
+  "cols": 2,
+  "cell_width": 224,
+  "cell_height": 128,
+  "runtime_pivot": {
+    "normalized": [
+      0.5,
+      0.9296875
+    ],
+    "pixels": [
+      112.0,
+      119.0
+    ]
+  },
+  "fit_scale": 0.85,
+  "trim_border": 4,
+  "edge_clean_depth": 3,
+  "align": "bottom",
+  "shared_scale": true,
+  "component_mode": "largest",
+  "component_padding": 0,
+  "min_component_area": 1,
+  "edge_touch_margin": 0,
+  "preserve_source_center_x": true,
+  "frame_labels": [
+    "attack-1",
+    "attack-2",
+    "attack-3",
+    "attack-4"
+  ],
+  "frames": [
+    {
+      "grid": [
+        0,
+        0
+      ],
+      "source_box": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "component_mode": "largest",
+      "component_count": 1,
+      "selected_component_area": 55258,
+      "selected_component_bbox": [
+        215,
+        159,
+        512,
+        516
+      ],
+      "crop_bbox": [
+        215,
+        159,
+        512,
+        516
+      ],
+      "edge_touch": false,
+      "output_size": [
+        90,
+        108
+      ],
+      "paste_position": [
+        82,
+        11
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        0,
+        1
+      ],
+      "source_box": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "component_mode": "largest",
+      "component_count": 1,
+      "selected_component_area": 53035,
+      "selected_component_bbox": [
+        8,
+        201,
+        443,
+        521
+      ],
+      "crop_bbox": [
+        8,
+        201,
+        443,
+        521
+      ],
+      "edge_touch": false,
+      "output_size": [
+        132,
+        97
+      ],
+      "paste_position": [
+        19,
+        22
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        1,
+        0
+      ],
+      "source_box": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "component_mode": "largest",
+      "component_count": 1,
+      "selected_component_area": 55059,
+      "selected_component_bbox": [
+        92,
+        107,
+        585,
+        418
+      ],
+      "crop_bbox": [
+        92,
+        107,
+        585,
+        418
+      ],
+      "edge_touch": false,
+      "output_size": [
+        150,
+        94
+      ],
+      "paste_position": [
+        44,
+        25
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        1,
+        1
+      ],
+      "source_box": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "component_mode": "largest",
+      "component_count": 1,
+      "selected_component_area": 54916,
+      "selected_component_bbox": [
+        121,
+        65,
+        415,
+        420
+      ],
+      "crop_bbox": [
+        121,
+        65,
+        415,
+        420
+      ],
+      "edge_touch": false,
+      "output_size": [
+        89,
+        108
+      ],
+      "paste_position": [
+        53,
+        11
+      ],
+      "output_edge_touch": false
+    }
+  ],
+  "source_edge_touch_frames": [],
+  "output_edge_touch_frames": [],
+  "edge_touch_frames": []
+}
