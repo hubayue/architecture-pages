@@ -1,0 +1,13 @@
+Create a second-candidate 2x3 animation sprite sheet for a detached cast aura VFX matching the accepted island scout hero's refined tropical pixel-art style, with clearly stronger animation than a nearly static rotating ring.
+
+Subject: "Driftwood Compass Cast Aura v2", a charged coastal spell-ring for the island scout. One recognizable compass-and-shell ring uses shell-white directional tips, turquoise tidal runes, tiny driftwood-brown notches, coral-orange beads and sparks, plus a compact inner water spiral at peak charge. It must feel like navigational tide magic, not a generic neon magic circle.
+
+Style: refined modern pixel art, crisp selective dark outline, controlled hand-placed pixel clusters, bright tropical teal/coral/sand palette, polished readability at small mobile roguelite scale. Match the island scout hero's pixel density, saturated palette, and clean game-sprite finish. No smooth vector lines, blur, 3D rendering, or painterly styling.
+
+Animation: EXACTLY six frames in a 2 row by 3 column grid, read left-to-right then top-to-bottom as a seamless charge loop. Frame 1 dormant ring with dim inner runes. Frame 2 two teal quadrants illuminate. Frame 3 all runes glow and beads lift outward. Frame 4 peak pulse with shell-white compass flash and compact inner water spiral. Frame 5 light recedes with orbiting coral sparks. Frame 6 returns toward dormant state. Keep the outer ring center, radius, and four shell tips in stable registration across all frames; motion should happen primarily in internal illumination, sparks, and the inner spiral.
+
+Sheet requirements: EXACTLY 2 rows by 3 columns, six equal square cells, no borders, dividers, guide marks, labels, or frame numbers. One complete aura centered in every cell, inside the central 70% safe area with generous magenta padding. Nothing touches or crosses any cell edge.
+
+Background: 100% uniform solid flat #FF00FF magenta across the full sheet for chroma-key processing, with no shadow, texture, floor plane, gradient, or transparency.
+
+Avoid: character, hands, staff, UI, text, watermark, extra spell circles, tiny invisible animation changes, overflowing sparks, photorealism, smooth vector art, painterly style.

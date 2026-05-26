@@ -1,0 +1,14 @@
+Create a 2x3 animation sprite sheet for a detached impact burst VFX matching the accepted island scout hero's refined tropical pixel-art style.
+
+Subject: "Blooming Tidepool Impact", a magical ocean hit effect. It begins as a shell-white star glint, blooms into a turquoise circular splash ring, throws a few coral-orange shard sparks, then dissolves into small foam bubbles and teal pixel droplets. The peak frame should look like a tidepool opening under the hit point, not a generic explosion.
+
+Style: refined modern pixel art, crisp selective dark outline, hand-placed pixel clusters, bright tropical palette of turquoise water, teal light, coral-orange accents, warm sand pixels, shell-white highlights. Match the island scout hero's pixel density and polished small-game readability.
+
+Animation: 6-frame non-looping impact sequence in a 2x3 grid, read left-to-right then top-to-bottom. Frame 1 tiny shell glint. Frame 2 small water ring opens. Frame 3 ring blooms with coral shard sparks. Frame 4 peak splash with foam crown. Frame 5 ring breaks into droplets. Frame 6 faint dissipating bubbles. Keep the center point stable in all frames.
+
+Sheet requirements: EXACTLY 2 rows by 3 columns, six equal square cells, no visible borders or dividers. One complete impact centered in each cell. The peak splash must remain inside the central 70% safe area with generous magenta gutters. Detached droplets are allowed but must clearly belong to the impact and must not touch cell edges.
+
+Background: 100% solid flat #FF00FF magenta in every cell, no gradient, no texture, no shadow, no ground plane.
+
+Avoid: character, weapon, UI, text, labels, watermark, frame numbers, fireball-only explosion, smoke cloud, photorealism, smooth vector art, painterly style, blurred glow, transparent background.
+

@@ -1,0 +1,14 @@
+Create a 4x4 animation sprite sheet for a detached ground trap VFX matching the accepted island scout hero's refined tropical pixel-art style.
+
+Subject: "Sandbar Snare Rune", a readable ground-control effect for a tropical scout skill. A sand-colored circular rune appears on the ground, shell-white compass ticks light up, teal water lines trace around the circle, then sea-grass and coral branch shapes curl inward like a snare before the effect breaks into foam bubbles and sand pixels. It should read as a snaring trap or root effect, not a generic magic circle.
+
+Style: refined modern pixel art, crisp selective dark outline, hand-placed pixel clusters, bright tropical teal/coral/sand palette, polished small-game readability. Match the island scout hero's pixel density and saturated island adventure palette.
+
+Animation: 16-frame non-looping sequence in a 4x4 grid, read left-to-right then top-to-bottom. Frames 1-3 faint sand ring appears. Frames 4-6 shell compass ticks and teal water lines activate. Frames 7-10 sea-grass/coral snare curls inward and reaches peak detail. Frames 11-13 the snare tightens and flashes shell-white. Frames 14-16 it breaks into foam bubbles and sand pixels. The center point and outer footprint must remain stable across all frames.
+
+Sheet requirements: EXACTLY 4 rows by 4 columns, sixteen equal square cells, no visible borders or dividers. One complete ground rune centered in each cell, viewed from top-down 3/4 but flat enough to place on a ground layer. Keep every frame inside the central 70% safe area with generous magenta padding. Detached bubbles and sand pixels are allowed only if they clearly belong to the effect and stay away from cell edges.
+
+Background: 100% solid flat #FF00FF magenta in every cell, no gradient, no texture, no shadow, no ground plane.
+
+Avoid: character, weapon, UI, text, labels, watermark, frame numbers, extra spell circles, giant vines that fill the cell, photorealism, smooth vector art, painterly style, blurred glow, transparent background.
+

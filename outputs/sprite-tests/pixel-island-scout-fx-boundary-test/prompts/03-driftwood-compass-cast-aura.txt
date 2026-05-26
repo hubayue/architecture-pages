@@ -1,0 +1,14 @@
+Create a 2x3 animation sprite sheet for a detached cast aura VFX matching the accepted island scout hero's refined tropical pixel-art style.
+
+Subject: "Driftwood Compass Cast Aura", a floating magical compass ring made of shell-white ticks, teal water runes, small driftwood-brown notches, and coral-orange bead sparks. It should feel like the island scout hero's shell compass necklace turned into a spell circle. The effect is a runtime layer that can be placed under or in front of a caster, but no character appears in this sheet.
+
+Style: refined modern pixel art, crisp dark outline on key ring pieces, hand-placed pixel clusters, bright tropical teal/coral/sand palette, readable at small mobile roguelite scale. Match the island scout hero's pixel density, saturated palette, and clean game-sprite polish.
+
+Animation: 6-frame loop in a 2x3 grid, read left-to-right then top-to-bottom. The compass ring rotates subtly clockwise. Teal water runes brighten in alternating quadrants. Coral bead sparks orbit in short stepped positions. The ring center, radius, and footprint remain stable in all frames so the aura can be layered under a character without wobbling.
+
+Sheet requirements: EXACTLY 2 rows by 3 columns, six equal square cells, no visible borders or dividers. One complete aura centered in each cell, inside the central 70% safe area with generous magenta padding. No pixel may touch or cross a cell edge. Do not draw guide boxes or cell borders.
+
+Background: 100% solid flat #FF00FF magenta in every cell, no gradient, no texture, no shadow, no ground plane.
+
+Avoid: character, hands, staff, UI, text, labels, watermark, frame numbers, extra spell circles, photorealism, smooth vector art, painterly style, blurred glow, transparent background.
+

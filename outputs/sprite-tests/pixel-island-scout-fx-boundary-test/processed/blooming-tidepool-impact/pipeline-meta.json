@@ -1,0 +1,237 @@
+{
+  "target": "asset",
+  "mode": "impact",
+  "prompt": "",
+  "role": "",
+  "input": "outputs\\sprite-tests\\pixel-island-scout-fx-boundary-test\\raw\\blooming-tidepool-impact-raw-sheet.png",
+  "threshold": 100,
+  "edge_threshold": 150,
+  "duration": 200,
+  "rows": 2,
+  "cols": 3,
+  "cell_width": 128,
+  "cell_height": 128,
+  "cell_size": 128,
+  "fit_scale": 0.9,
+  "trim_border": 4,
+  "edge_clean_depth": 3,
+  "align": "center",
+  "shared_scale": true,
+  "component_mode": "all",
+  "component_padding": 0,
+  "min_component_area": 1,
+  "edge_touch_margin": 0,
+  "preserve_source_center_x": false,
+  "preserve_frame_layout": false,
+  "frame_offset": [
+    0,
+    0
+  ],
+  "frame_offsets_file": null,
+  "registration_offsets": null,
+  "frame_labels": [
+    "impact-1",
+    "impact-2",
+    "impact-3",
+    "impact-4",
+    "impact-5",
+    "impact-6"
+  ],
+  "frames": [
+    {
+      "grid": [
+        0,
+        0
+      ],
+      "source_box": [
+        0,
+        0,
+        511,
+        512
+      ],
+      "component_mode": "all",
+      "component_count": 6,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        228,
+        240,
+        330,
+        322
+      ],
+      "edge_touch": false,
+      "output_size": [
+        32,
+        25
+      ],
+      "paste_position": [
+        48,
+        51
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        0,
+        1
+      ],
+      "source_box": [
+        511,
+        0,
+        1022,
+        512
+      ],
+      "component_mode": "all",
+      "component_count": 24,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        110,
+        198,
+        374,
+        369
+      ],
+      "edge_touch": false,
+      "output_size": [
+        83,
+        53
+      ],
+      "paste_position": [
+        22,
+        37
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        0,
+        2
+      ],
+      "source_box": [
+        1022,
+        0,
+        1533,
+        512
+      ],
+      "component_mode": "all",
+      "component_count": 43,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        44,
+        158,
+        397,
+        385
+      ],
+      "edge_touch": false,
+      "output_size": [
+        111,
+        71
+      ],
+      "paste_position": [
+        8,
+        28
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        1,
+        0
+      ],
+      "source_box": [
+        0,
+        512,
+        511,
+        1024
+      ],
+      "component_mode": "all",
+      "component_count": 41,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        87,
+        81,
+        453,
+        350
+      ],
+      "edge_touch": false,
+      "output_size": [
+        115,
+        84
+      ],
+      "paste_position": [
+        6,
+        22
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        1,
+        1
+      ],
+      "source_box": [
+        511,
+        512,
+        1022,
+        1024
+      ],
+      "component_mode": "all",
+      "component_count": 45,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        82,
+        113,
+        400,
+        346
+      ],
+      "edge_touch": false,
+      "output_size": [
+        100,
+        73
+      ],
+      "paste_position": [
+        14,
+        27
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        1,
+        2
+      ],
+      "source_box": [
+        1022,
+        512,
+        1533,
+        1024
+      ],
+      "component_mode": "all",
+      "component_count": 30,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        78,
+        116,
+        346,
+        338
+      ],
+      "edge_touch": false,
+      "output_size": [
+        84,
+        69
+      ],
+      "paste_position": [
+        22,
+        29
+      ],
+      "output_edge_touch": false
+    }
+  ],
+  "source_edge_touch_frames": [],
+  "output_edge_touch_frames": [],
+  "edge_touch_frames": []
+}

@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>特效验收面板</title>
+  <style>
+    :root {
+      --bg: #11171c;
+      --panel: #1a2229;
+      --panel-2: #202930;
+      --line: #33414a;
+      --text: #edf2f3;
+      --muted: #a7b4b8;
+      --teal: #31c4b7;
+      --coral: #f08a67;
+      --gold: #e7c46a;
+      --green: #48c37b;
+      --violet: #8d86ff;
+      --checker-a: #232e35;
+      --checker-b: #2a3540;
+      --radius: 8px;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      background: radial-gradient(circle at top, #182026 0%, var(--bg) 55%);
+      color: var(--text);
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body { min-width: 320px; }
+
+    main {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 28px 28px 38px;
+      display: grid;
+      gap: 18px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 31px;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .result {
+      min-width: 280px;
+      padding: 13px 14px 14px;
+      border: 1px solid rgba(72, 195, 123, 0.36);
+      border-radius: var(--radius);
+      background: rgba(72, 195, 123, 0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .result-label,
+    .section-kicker {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .result-value {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 7px;
+      color: #baf0cf;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .status-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 5px rgba(72, 195, 123, 0.12);
+      flex: 0 0 auto;
+    }
+
+    .result-note {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric-tile {
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .metric-title {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric-number {
+      margin-top: 7px;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.08;
+    }
+
+    .metric-foot {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .panel {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(26, 34, 41, 0.96);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 3px 0 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .panel-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      text-align: right;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .asset-card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #232d35 0%, #1f272e 100%);
+      overflow: hidden;
+    }
+
+    .asset-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 12px 9px;
+    }
+
+    .asset-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(72, 195, 123, 0.34);
+      color: #bff1d0;
+      background: rgba(72, 195, 123, 0.09);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge.warn {
+      border-color: rgba(240, 138, 103, 0.35);
+      color: #ffcfbf;
+      background: rgba(240, 138, 103, 0.09);
+    }
+
+    .badge.neutral {
+      border-color: rgba(231, 196, 106, 0.28);
+      color: #f7e2a9;
+      background: rgba(231, 196, 106, 0.07);
+    }
+
+    .media-frame {
+      height: 194px;
+      margin: 0 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #32404a;
+      border-radius: 6px;
+      background-color: var(--checker-a);
+      background-image:
+        linear-gradient(45deg, var(--checker-b) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--checker-b) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--checker-b) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--checker-b) 75%);
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      background-size: 20px 20px;
+      overflow: hidden;
+    }
+
+    .media-frame img {
+      width: 176px;
+      height: 176px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      display: block;
+    }
+
+    .wide-frame img {
+      width: min(100%, 220px);
+      height: 128px;
+    }
+
+    .switch {
+      display: flex;
+      gap: 4px;
+      padding: 10px 11px 6px;
+    }
+
+    .switch button {
+      flex: 1;
+      height: 28px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: transparent;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .switch button[aria-pressed="true"] {
+      color: var(--text);
+      border-color: rgba(49, 196, 183, 0.45);
+      background: rgba(49, 196, 183, 0.13);
+    }
+
+    .asset-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      padding: 4px 11px 11px;
+    }
+
+    .stat {
+      min-width: 0;
+      padding: 8px 7px 7px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .stat-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .stat-value {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .stat-note {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+    }
+
+    .compare-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .compare-card {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+
+    .compare-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 10px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .compare-card h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .compare-card .mini-note {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .compare-media {
+      height: 178px;
+      margin: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #31404a;
+      border-radius: 6px;
+      background-color: var(--checker-a);
+      background-image:
+        linear-gradient(45deg, var(--checker-b) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--checker-b) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--checker-b) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--checker-b) 75%);
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      background-size: 20px 20px;
+    }
+
+    .compare-media img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .compare-card .body {
+      padding: 9px 10px 11px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .chart {
+      display: grid;
+      gap: 12px;
+    }
+
+    .chart-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 122px 1fr 76px 72px;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .bar-track {
+      position: relative;
+      height: 16px;
+      border-radius: 4px;
+      background: #28323a;
+      overflow: hidden;
+    }
+
+    .bar-track::before {
+      content: "";
+      position: absolute;
+      left: 84%;
+      top: 0;
+      bottom: 0;
+      border-left: 1px dashed rgba(231, 196, 106, 0.95);
+      z-index: 2;
+    }
+
+    .bar {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--teal);
+    }
+
+    .bar.coral { background: var(--coral); }
+    .bar.gold { background: var(--gold); }
+    .bar.green { background: var(--green); }
+    .bar.violet { background: var(--violet); }
+
+    .delta {
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .qc-grid {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 14px;
+    }
+
+    .qc-list {
+      display: grid;
+      gap: 9px;
+      margin-top: 3px;
+    }
+
+    .qc-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel-2);
+    }
+
+    .qc-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .qc-value {
+      color: #bcf1d0;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .finding {
+      min-height: 112px;
+      padding: 15px 15px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .finding.boundary { border-left: 3px solid var(--coral); }
+    .finding.keep { border-left: 3px solid var(--teal); }
+
+    .finding h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .finding ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 1180px) {
+      .metrics,
+      .gallery,
+      .comparison,
+      .qc-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      header { display: grid; }
+      .result { min-width: 0; }
+    }
+
+    @media (max-width: 760px) {
+      main { padding: 18px; }
+      .metrics,
+      .gallery,
+      .comparison,
+      .qc-grid,
+      .compare-strip { grid-template-columns: 1fr; }
+      .bar-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+      .bar-row .delta { text-align: left; }
+      footer { display: grid; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="kicker">Sprite Forge / FX Boundary Test</p>
+        <h1>特效验收面板</h1>
+        <p class="subtitle">像素风特效素材第一轮可视化验收，覆盖效果预览、帧数、透明占比、帧间变化强度与边界检查。</p>
+      </div>
+      <div class="result">
+        <div class="result-label">最终判定</div>
+        <div class="result-value"><span class="status-dot"></span>素材级初验通过</div>
+        <div class="result-note">5 项主候选通过素材级初验；施法环 v1 作为对照样本纳入量化数据。</div>
+      </div>
+    </header>
+
+    <section class="metrics" aria-label="summary metrics">
+      <div class="metric-tile">
+        <div class="metric-title">展示资产</div>
+        <div class="metric-number">5</div>
+        <div class="metric-foot">当前通过初验的主候选</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-title">初验通过</div>
+        <div class="metric-number">5</div>
+        <div class="metric-foot">投射物 / 命中 / 施法环 v2 / 宽幅斩击 / 长序列符文</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-title">越界帧数</div>
+        <div class="metric-number">0</div>
+        <div class="metric-foot">全部候选都保持在边界内</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-title">最长序列</div>
+        <div class="metric-number">16 帧</div>
+        <div class="metric-foot">sandbar-snare-rune</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-title">宽幅交付</div>
+        <div class="metric-number">224x128</div>
+        <div class="metric-foot">coral-tide-slash 交付格</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-title">透明导出</div>
+        <div class="metric-number">通过</div>
+        <div class="metric-foot">GIF / PNG / 透明精灵表已生成</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="section-kicker">Visual Assets</div>
+          <h2>逐项特效预览</h2>
+        </div>
+        <div class="panel-note">支持动画预览与透明精灵表切换。</div>
+      </div>
+
+      <div class="gallery">
+        <article class="asset-card">
+          <div class="asset-head">
+            <span class="asset-name">REEFLIGHT PROJECTILE</span>
+            <span class="badge">PASS</span>
+          </div>
+          <div class="media-frame">
+            <img src="../processed/reeflight-projectile/animation.gif" data-gif="../processed/reeflight-projectile/animation.gif" data-sheet="../processed/reeflight-projectile/sheet-transparent.png" alt="Reeflight Projectile 预览">
+          </div>
+          <div class="switch">
+            <button type="button" data-kind="gif" aria-pressed="true">动画</button>
+            <button type="button" data-kind="sheet" aria-pressed="false">精灵表</button>
+          </div>
+          <div class="asset-stats">
+            <div class="stat"><span class="stat-label">帧数</span><span class="stat-value">4</span><div class="stat-note">travel loop</div></div>
+            <div class="stat"><span class="stat-label">透明占比</span><span class="stat-value">15.70%</span><div class="stat-note">小而干净</div></div>
+            <div class="stat"><span class="stat-label">变化强度</span><span class="stat-value">21.87%</span><div class="stat-note">相对高项</div></div>
+            <div class="stat"><span class="stat-label">边界</span><span class="stat-value">0 帧</span><div class="stat-note">安全</div></div>
+          </div>
+        </article>
+
+        <article class="asset-card">
+          <div class="asset-head">
+            <span class="asset-name">BLOOMING TIDEPOOL IMPACT</span>
+            <span class="badge">PASS</span>
+          </div>
+          <div class="media-frame">
+            <img src="../processed/blooming-tidepool-impact/animation.gif" data-gif="../processed/blooming-tidepool-impact/animation.gif" data-sheet="../processed/blooming-tidepool-impact/sheet-transparent.png" alt="Blooming Tidepool Impact 预览">
+          </div>
+          <div class="switch">
+            <button type="button" data-kind="gif" aria-pressed="true">动画</button>
+            <button type="button" data-kind="sheet" aria-pressed="false">精灵表</button>
+          </div>
+          <div class="asset-stats">
+            <div class="stat"><span class="stat-label">帧数</span><span class="stat-value">6</span><div class="stat-note">burst sequence</div></div>
+            <div class="stat"><span class="stat-label">透明占比</span><span class="stat-value">15.60%</span><div class="stat-note">爆发集中</div></div>
+            <div class="stat"><span class="stat-label">变化强度</span><span class="stat-value">33.92%</span><div class="stat-note">多阶段清晰</div></div>
+            <div class="stat"><span class="stat-label">边界</span><span class="stat-value">0 帧</span><div class="stat-note">安全</div></div>
+          </div>
+        </article>
+
+        <article class="asset-card">
+          <div class="asset-head">
+            <span class="asset-name">DRIFTWOOD COMPASS AURA V2</span>
+            <span class="badge">PASS</span>
+          </div>
+          <div class="media-frame">
+            <img src="../processed/driftwood-compass-cast-aura-v2/animation.gif" data-gif="../processed/driftwood-compass-cast-aura-v2/animation.gif" data-sheet="../processed/driftwood-compass-cast-aura-v2/sheet-transparent.png" alt="Driftwood Compass Cast Aura v2 预览">
+          </div>
+          <div class="switch">
+            <button type="button" data-kind="gif" aria-pressed="true">动画</button>
+            <button type="button" data-kind="sheet" aria-pressed="false">精灵表</button>
+          </div>
+          <div class="asset-stats">
+            <div class="stat"><span class="stat-label">帧数</span><span class="stat-value">6</span><div class="stat-note">charge loop</div></div>
+            <div class="stat"><span class="stat-label">透明占比</span><span class="stat-value">25.89%</span><div class="stat-note">内圈脉冲清楚</div></div>
+            <div class="stat"><span class="stat-label">变化强度</span><span class="stat-value">23.26%</span><div class="stat-note">较 v1 明显提升</div></div>
+            <div class="stat"><span class="stat-label">边界</span><span class="stat-value">0 帧</span><div class="stat-note">主候选</div></div>
+          </div>
+        </article>
+
+        <article class="asset-card">
+          <div class="asset-head">
+            <span class="asset-name">CORAL TIDE SLASH</span>
+            <span class="badge neutral">WIDTH TEST</span>
+          </div>
+          <div class="media-frame wide-frame">
+            <img src="../processed/coral-tide-slash/animation.gif" data-gif="../processed/coral-tide-slash/animation.gif" data-sheet="../processed/coral-tide-slash/sheet-transparent.png" alt="Coral Tide Slash 预览">
+          </div>
+          <div class="switch">
+            <button type="button" data-kind="gif" aria-pressed="true">动画</button>
+            <button type="button" data-kind="sheet" aria-pressed="false">精灵表</button>
+          </div>
+          <div class="asset-stats">
+            <div class="stat"><span class="stat-label">帧数</span><span class="stat-value">4</span><div class="stat-note">wide delivery</div></div>
+            <div class="stat"><span class="stat-label">透明占比</span><span class="stat-value">19.40%</span><div class="stat-note">宽弧明显</div></div>
+            <div class="stat"><span class="stat-label">变化强度</span><span class="stat-value">100%</span><div class="stat-note">最高值基准</div></div>
+            <div class="stat"><span class="stat-label">边界</span><span class="stat-value">0 帧</span><div class="stat-note">原点待验</div></div>
+          </div>
+        </article>
+
+        <article class="asset-card">
+          <div class="asset-head">
+            <span class="asset-name">SANDBAR SNARE RUNE</span>
+            <span class="badge">PASS</span>
+          </div>
+          <div class="media-frame">
+            <img src="../processed/sandbar-snare-rune/animation.gif" data-gif="../processed/sandbar-snare-rune/animation.gif" data-sheet="../processed/sandbar-snare-rune/sheet-transparent.png" alt="Sandbar Snare Rune 预览">
+          </div>
+          <div class="switch">
+            <button type="button" data-kind="gif" aria-pressed="true">动画</button>
+            <button type="button" data-kind="sheet" aria-pressed="false">精灵表</button>
+          </div>
+          <div class="asset-stats">
+            <div class="stat"><span class="stat-label">帧数</span><span class="stat-value">16</span><div class="stat-note">long sequence</div></div>
+            <div class="stat"><span class="stat-label">透明占比</span><span class="stat-value">30.67%</span><div class="stat-note">信息最多</div></div>
+            <div class="stat"><span class="stat-label">变化强度</span><span class="stat-value">11.33%</span><div class="stat-note">慢烧到释放</div></div>
+            <div class="stat"><span class="stat-label">边界</span><span class="stat-value">0 帧</span><div class="stat-note">边界候选</div></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="comparison">
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="section-kicker">Boundary Compare</div>
+            <h2>施法环 v1 / v2 对照</h2>
+          </div>
+          <div class="panel-note">同一主题，两种动势</div>
+        </div>
+        <div class="compare-strip">
+          <div class="compare-card">
+            <header>
+              <h3>v1</h3>
+              <span class="mini-note">对照样本</span>
+            </header>
+            <div class="compare-media">
+              <img src="../processed/driftwood-compass-cast-aura/animation.gif" alt="Driftwood Compass Cast Aura v1">
+            </div>
+            <div class="body">
+              外圈和图形读性符合要求，但内部变化幅度偏低，作为施法反馈的强度不足。该版本用于对照变化强度指标。
+            </div>
+          </div>
+          <div class="compare-card">
+            <header>
+              <h3>v2</h3>
+              <span class="mini-note">主候选</span>
+            </header>
+            <div class="compare-media">
+              <img src="../processed/driftwood-compass-cast-aura-v2/animation.gif" alt="Driftwood Compass Cast Aura v2">
+            </div>
+            <div class="body">
+              保留稳定罗盘边界，并增强内圈潮汐脉冲、光斑和旋涡力度。该版本作为施法环主候选。
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel chart">
+        <div class="panel-head">
+          <div>
+            <div class="section-kicker">Quant Bars</div>
+            <h2>帧间变化强度</h2>
+          </div>
+          <div class="panel-note">相对最高项归一化，用于比较动态表现差异。</div>
+        </div>
+        <div class="chart-list">
+          <div class="bar-row"><strong>Slash</strong><div class="bar-track"><div class="bar coral" style="width:100%"></div></div><span>6915678</span><span class="delta">100%</span></div>
+          <div class="bar-row"><strong>Impact</strong><div class="bar-track"><div class="bar gold" style="width:33.92%"></div></div><span>2345652</span><span class="delta">33.92%</span></div>
+          <div class="bar-row"><strong>Aura v2</strong><div class="bar-track"><div class="bar teal" style="width:23.26%"></div></div><span>1608100</span><span class="delta">23.26%</span></div>
+          <div class="bar-row"><strong>Projectile</strong><div class="bar-track"><div class="bar green" style="width:21.87%"></div></div><span>1512970</span><span class="delta">21.87%</span></div>
+          <div class="bar-row"><strong>Rune</strong><div class="bar-track"><div class="bar violet" style="width:11.33%"></div></div><span>783874</span><span class="delta">11.33%</span></div>
+          <div class="bar-row"><strong>Aura v1</strong><div class="bar-track"><div class="bar" style="width:6.32%"></div></div><span>436864</span><span class="delta">6.32%</span></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="qc-grid">
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="section-kicker">Coverage</div>
+            <h2>有效像素占比</h2>
+          </div>
+          <div class="panel-note">用于比较各特效的画面信息密度。</div>
+        </div>
+        <div class="chart-list">
+          <div class="bar-row"><strong>Rune</strong><div class="bar-track"><div class="bar teal" style="width:30.67%"></div></div><span>30.67%</span><span class="delta">dense</span></div>
+          <div class="bar-row"><strong>Aura v2</strong><div class="bar-track"><div class="bar coral" style="width:25.89%"></div></div><span>25.89%</span><span class="delta">balanced</span></div>
+          <div class="bar-row"><strong>Aura v1</strong><div class="bar-track"><div class="bar gold" style="width:24.31%"></div></div><span>24.31%</span><span class="delta">quiet</span></div>
+          <div class="bar-row"><strong>Slash</strong><div class="bar-track"><div class="bar violet" style="width:19.40%"></div></div><span>19.40%</span><span class="delta">wide</span></div>
+          <div class="bar-row"><strong>Projectile</strong><div class="bar-track"><div class="bar green" style="width:15.70%"></div></div><span>15.70%</span><span class="delta">compact</span></div>
+          <div class="bar-row"><strong>Impact</strong><div class="bar-track"><div class="bar" style="width:15.60%"></div></div><span>15.60%</span><span class="delta">compact</span></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="section-kicker">QC Checks</div>
+            <h2>量化初验</h2>
+          </div>
+        </div>
+        <div class="qc-list">
+          <div class="qc-item"><span class="qc-label">透明导出</span><span class="qc-value">通过</span></div>
+          <div class="qc-item"><span class="qc-label">越界帧</span><span class="qc-value">0 帧</span></div>
+          <div class="qc-item"><span class="qc-label">施法环 v1</span><span class="qc-value">对照样本</span></div>
+          <div class="qc-item"><span class="qc-label">施法环 v2</span><span class="qc-value">主候选</span></div>
+          <div class="qc-item"><span class="qc-label">宽幅斩击</span><span class="qc-value">224x128 交付格</span></div>
+          <div class="qc-item"><span class="qc-label">长序列符文</span><span class="qc-value">16 帧</span></div>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      <div>报告文件：<code>outputs/sprite-tests/pixel-island-scout-fx-boundary-test/qc/visual-report.html</code></div>
+      <div>数据源：<code>fx-boundary-first-pass-report.json</code> 与处理后 GIF / PNG 预览</div>
+    </footer>
+  </main>
+
+  <script>
+    document.querySelectorAll(".asset-card").forEach((card) => {
+      const img = card.querySelector("img[data-gif]");
+      const buttons = Array.from(card.querySelectorAll("button[data-kind]"));
+      if (!img || buttons.length < 2) return;
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const kind = button.dataset.kind;
+          img.src = img.dataset[kind];
+          buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+        });
+      });
+    });
+  </script>
+</body>
+</html>

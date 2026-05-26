@@ -1,0 +1,180 @@
+{
+  "target": "asset",
+  "mode": "slash-fx",
+  "prompt": "",
+  "role": "",
+  "input": "outputs\\sprite-tests\\pixel-island-scout-fx-boundary-test\\raw\\coral-tide-slash-raw-sheet.png",
+  "threshold": 100,
+  "edge_threshold": 150,
+  "duration": 200,
+  "rows": 2,
+  "cols": 2,
+  "cell_width": 224,
+  "cell_height": 128,
+  "runtime_pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "pixels": [
+      112.0,
+      64.0
+    ]
+  },
+  "fit_scale": 0.96,
+  "trim_border": 4,
+  "edge_clean_depth": 3,
+  "align": "center",
+  "shared_scale": true,
+  "component_mode": "all",
+  "component_padding": 0,
+  "min_component_area": 1,
+  "edge_touch_margin": 0,
+  "preserve_source_center_x": true,
+  "preserve_frame_layout": false,
+  "frame_offset": [
+    0,
+    0
+  ],
+  "frame_offsets_file": null,
+  "registration_offsets": null,
+  "frame_labels": [
+    "slash-1",
+    "slash-2",
+    "slash-3",
+    "slash-4"
+  ],
+  "frames": [
+    {
+      "grid": [
+        0,
+        0
+      ],
+      "source_box": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "component_mode": "all",
+      "component_count": 9,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        77,
+        437,
+        501,
+        560
+      ],
+      "edge_touch": false,
+      "output_size": [
+        156,
+        45
+      ],
+      "paste_position": [
+        25,
+        41
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        0,
+        1
+      ],
+      "source_box": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "component_mode": "all",
+      "component_count": 17,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        34,
+        319,
+        560,
+        589
+      ],
+      "edge_touch": false,
+      "output_size": [
+        193,
+        99
+      ],
+      "paste_position": [
+        9,
+        14
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        1,
+        0
+      ],
+      "source_box": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "component_mode": "all",
+      "component_count": 28,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        33,
+        209,
+        617,
+        405
+      ],
+      "edge_touch": false,
+      "output_size": [
+        215,
+        72
+      ],
+      "paste_position": [
+        9,
+        28
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        1,
+        1
+      ],
+      "source_box": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "component_mode": "all",
+      "component_count": 59,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        49,
+        235,
+        569,
+        435
+      ],
+      "edge_touch": false,
+      "output_size": [
+        191,
+        73
+      ],
+      "paste_position": [
+        15,
+        27
+      ],
+      "output_edge_touch": false
+    }
+  ],
+  "source_edge_touch_frames": [],
+  "output_edge_touch_frames": [],
+  "edge_touch_frames": []
+}

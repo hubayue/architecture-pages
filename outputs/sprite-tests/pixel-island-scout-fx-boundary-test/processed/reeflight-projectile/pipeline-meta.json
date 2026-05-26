@@ -1,0 +1,171 @@
+{
+  "target": "asset",
+  "mode": "projectile",
+  "prompt": "",
+  "role": "",
+  "input": "outputs\\sprite-tests\\pixel-island-scout-fx-boundary-test\\raw\\reeflight-projectile-raw-sheet.png",
+  "threshold": 100,
+  "edge_threshold": 150,
+  "duration": 200,
+  "rows": 2,
+  "cols": 2,
+  "cell_width": 128,
+  "cell_height": 128,
+  "cell_size": 128,
+  "fit_scale": 0.92,
+  "trim_border": 4,
+  "edge_clean_depth": 3,
+  "align": "center",
+  "shared_scale": true,
+  "component_mode": "all",
+  "component_padding": 0,
+  "min_component_area": 1,
+  "edge_touch_margin": 0,
+  "preserve_source_center_x": false,
+  "preserve_frame_layout": false,
+  "frame_offset": [
+    0,
+    0
+  ],
+  "frame_offsets_file": null,
+  "registration_offsets": null,
+  "frame_labels": [
+    "projectile-1",
+    "projectile-2",
+    "projectile-3",
+    "projectile-4"
+  ],
+  "frames": [
+    {
+      "grid": [
+        0,
+        0
+      ],
+      "source_box": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "component_mode": "all",
+      "component_count": 1,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        234,
+        273,
+        430,
+        428
+      ],
+      "edge_touch": false,
+      "output_size": [
+        59,
+        46
+      ],
+      "paste_position": [
+        34,
+        41
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        0,
+        1
+      ],
+      "source_box": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "component_mode": "all",
+      "component_count": 7,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        132,
+        277,
+        482,
+        428
+      ],
+      "edge_touch": false,
+      "output_size": [
+        105,
+        45
+      ],
+      "paste_position": [
+        11,
+        41
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        1,
+        0
+      ],
+      "source_box": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "component_mode": "all",
+      "component_count": 7,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        145,
+        195,
+        534,
+        371
+      ],
+      "edge_touch": false,
+      "output_size": [
+        117,
+        53
+      ],
+      "paste_position": [
+        5,
+        37
+      ],
+      "output_edge_touch": false
+    },
+    {
+      "grid": [
+        1,
+        1
+      ],
+      "source_box": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "component_mode": "all",
+      "component_count": 9,
+      "selected_component_area": null,
+      "selected_component_bbox": null,
+      "crop_bbox": [
+        132,
+        195,
+        442,
+        365
+      ],
+      "edge_touch": false,
+      "output_size": [
+        93,
+        51
+      ],
+      "paste_position": [
+        17,
+        38
+      ],
+      "output_edge_touch": false
+    }
+  ],
+  "source_edge_touch_frames": [],
+  "output_edge_touch_frames": [],
+  "edge_touch_frames": []
+}

@@ -1,0 +1,75 @@
+{
+  "test": "pixel_island_scout_fx_boundary_test",
+  "status": "not_run_api_key_missing",
+  "style_reference": "accepted pixel-island-scout hero assets",
+  "gates": {
+    "style_match": "pending",
+    "pixel_art_readability": "pending",
+    "edge_touch": "pending",
+    "transparent_export": "pending",
+    "frame_scale_consistency": "pending",
+    "runtime_origin_readiness": "pending"
+  },
+  "assets": {
+    "reeflight_projectile": {
+      "sheet": "2x2",
+      "frames": 4,
+      "purpose": "projectile loop",
+      "expected_output_dir": "processed/reeflight-projectile",
+      "stress_points": [
+        "direction consistency",
+        "short trail cleanup",
+        "loop readability"
+      ],
+      "status": "not_run"
+    },
+    "blooming_tidepool_impact": {
+      "sheet": "2x3",
+      "frames": 6,
+      "purpose": "impact burst",
+      "expected_output_dir": "processed/blooming-tidepool-impact",
+      "stress_points": [
+        "multi-component burst",
+        "detached droplets",
+        "non-loop timing"
+      ],
+      "status": "not_run"
+    },
+    "driftwood_compass_cast_aura": {
+      "sheet": "2x3",
+      "frames": 6,
+      "purpose": "cast aura loop",
+      "expected_output_dir": "processed/driftwood-compass-cast-aura",
+      "stress_points": [
+        "ring center stability",
+        "symbol readability",
+        "loop continuity"
+      ],
+      "status": "not_run"
+    },
+    "coral_tide_slash": {
+      "sheet": "2x2",
+      "frames": 4,
+      "purpose": "wide slash fx",
+      "expected_output_dir": "processed/coral-tide-slash",
+      "stress_points": [
+        "wide delivery frame",
+        "origin metadata",
+        "non-compressed silhouette"
+      ],
+      "status": "not_run"
+    },
+    "sandbar_snare_rune": {
+      "sheet": "4x4",
+      "frames": 16,
+      "purpose": "ground trap sequence",
+      "expected_output_dir": "processed/sandbar-snare-rune",
+      "stress_points": [
+        "long sequence consistency",
+        "stable footprint",
+        "dense detail cleanup"
+      ],
+      "status": "not_run"
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "test": "pixel_island_scout_fx_boundary_test",
+  "status": "passed_with_runtime_verification_pending",
+  "generation_path": "built-in image_gen / Image2",
+  "style_reference": "accepted pixel-island-scout hero assets",
+  "summary_zh": "第一轮像素特效边界测试已产出。投射物、潮池命中、加强版罗盘施法环、宽幅潮汐斩与16帧沙洲缠绕符文均具有海岛侦察兵主题辨识度，并通过透明拆帧与边缘越界门槛。第一版施法环保留为动态反馈不足的失败样本。当前结论仍属于素材级初验通过，尚需 runtime 合成、原点和混合表现验证。",
+  "global_gates": {
+    "style_match": "pass_visual_review",
+    "transparent_export": "pass",
+    "edge_touch": "pass_all_accepted_candidates",
+    "prompt_traceability": "pass",
+    "engine_playback": "pending",
+    "runtime_compositing": "pending"
+  },
+  "assets": {
+    "reeflight_projectile": {
+      "status": "provisional_pass",
+      "sheet": "2x2",
+      "frames": 4,
+      "output_dir": "../processed/reeflight-projectile",
+      "edge_touch_frames": [],
+      "review_zh": "贝壳核心加潮水尾迹的读形清楚，方向一致，适合继续测试飞行速度与叠加混合。"
+    },
+    "blooming_tidepool_impact": {
+      "status": "provisional_pass",
+      "sheet": "2x3",
+      "frames": 6,
+      "output_dir": "../processed/blooming-tidepool-impact",
+      "edge_touch_frames": [],
+      "review_zh": "由贝壳星芒到潮池水花再到泡沫消散的阶段可读，多组件爆发能力得到验证。"
+    },
+    "driftwood_compass_cast_aura": {
+      "status": "retained_failure_sample",
+      "sheet": "2x3",
+      "frames": 6,
+      "output_dir": "../processed/driftwood-compass-cast-aura",
+      "edge_touch_frames": [],
+      "review_zh": "风格与中心稳定性良好，但逐帧变化过弱，不作为主交付候选。"
+    },
+    "driftwood_compass_cast_aura_v2": {
+      "status": "provisional_pass",
+      "sheet": "2x3",
+      "frames": 6,
+      "output_dir": "../processed/driftwood-compass-cast-aura-v2",
+      "edge_touch_frames": [],
+      "review_zh": "外圈稳定，内部潮汐漩涡和亮度脉冲明显，可作为施法环主候选。"
+    },
+    "coral_tide_slash": {
+      "status": "provisional_pass_runtime_origin_pending",
+      "sheet": "2x2",
+      "frames": 4,
+      "delivery_cell": [224, 128],
+      "runtime_pivot_normalized": [0.5, 0.5],
+      "output_dir": "../processed/coral-tide-slash",
+      "edge_touch_frames": [],
+      "max_processed_frame_size": [215, 72],
+      "review_zh": "宽幅水弧和珊瑚碎光辨识度强，未越界但宽度余量较紧，必须接入 runtime 验证裁切与原点。"
+    },
+    "sandbar_snare_rune": {
+      "status": "provisional_pass_boundary_candidate",
+      "sheet": "4x4",
+      "frames": 16,
+      "output_dir": "../processed/sandbar-snare-rune",
+      "edge_touch_frames": [],
+      "review_zh": "地面控制技能的成形、收束与消散阶段成立，是当前最能体现长序列复杂特效能力的候选。"
+    }
+  },
+  "next_gates": [
+    "在角色或测试场景中叠加 projectile / impact / aura / slash / rune，检查比例与遮挡",
+    "验证宽幅 slash 的 pivot、裁切边界与攻击命中时序",
+    "验证透明 PNG 在目标 runtime 的混合模式和像素采样设置",
+    "为通过 runtime 合成的资产形成正式 skill bundle 交付目录"
+  ]
+}

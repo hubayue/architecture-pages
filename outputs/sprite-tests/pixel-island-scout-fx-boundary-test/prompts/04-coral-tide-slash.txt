@@ -1,0 +1,14 @@
+Create a 2x2 animation sprite sheet for a detached wide slash VFX matching the accepted island scout hero's refined tropical pixel-art style.
+
+Subject: "Coral Tide Slash", a wide horizontal ocean slash arc for the island scout hero's staff attack. It is not attached to a character. The slash is a crescent of turquoise water with shell-white pixel highlights, coral-orange shard sparks along the outer edge, and a few foam bubbles breaking off behind the arc. It should be instantly readable as a tropical water-and-coral attack effect, not a plain blue swoosh.
+
+Style: refined modern pixel art, crisp selective dark outline, hand-placed pixel clusters, bright tropical teal/coral/sand palette, polished mobile roguelite VFX quality. Match the accepted island scout hero's pixel density and outline language.
+
+Animation: 4-frame non-looping slash sequence in a 2x2 grid. Frame 1 thin anticipation crescent beginning at left. Frame 2 wide bright sweeping arc. Frame 3 fullest long horizontal slash with coral sparks and water crest. Frame 4 dissipating broken foam arc. Keep the slash centered on the same invisible origin line in all frames. The shape should be wide and horizontal, with enough empty magenta margin that later delivery can use wide 224x128 frames.
+
+Sheet requirements: EXACTLY 2 rows by 2 columns, four equal square cells, no visible borders or dividers. One complete slash centered in each cell. Full effect must stay inside its cell with generous left and right magenta padding. No pixel may touch or cross a source-cell boundary.
+
+Background: 100% solid flat #FF00FF magenta in every cell, no gradient, no texture, no shadow, no ground plane.
+
+Avoid: character, hand, staff, UI, text, labels, watermark, frame numbers, generic anime slash, lightning-only effect, photorealism, smooth vector art, painterly style, blurred glow, transparent background.
+

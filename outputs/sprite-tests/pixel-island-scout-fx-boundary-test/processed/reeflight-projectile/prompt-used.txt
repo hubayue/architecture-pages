@@ -1,0 +1,14 @@
+Create a 2x2 animation sprite sheet for a detached projectile VFX matching the accepted island scout hero's refined tropical pixel-art style.
+
+Subject: "Reeflight Projectile", a small turquoise shell-crystal water bolt traveling left-to-right. It has a bright shell-white core, teal water-glow body, two coral-orange spark pixels near the center, and a short broken pixel trail of foam bubbles and tiny wave shards. The silhouette must be readable as a magical ocean projectile, not a generic fireball.
+
+Style: refined modern pixel art, crisp dark outline only where the form needs definition, hand-placed pixel clusters, bright tropical teal/coral/sand palette, compact mobile roguelite VFX scale. Match the pixel density, outline weight, and saturated tropical palette of the island scout hero assets. No smooth vector gradients, no 3D, no painterly brush strokes.
+
+Animation: 4-frame loop in a 2x2 grid. The projectile pulses and advances internally while staying centered in each cell: frame 1 compact core, frame 2 longer water shell with small foam trail, frame 3 brightest stretched glint, frame 4 trail curls back into compact loop. The direction remains left-to-right in every frame. Same projectile identity and scale across all frames.
+
+Sheet requirements: EXACTLY 2 rows by 2 columns, four equal square cells, no visible borders or dividers. One complete projectile centered in each cell, inside the central 60% to 70% safe area with generous magenta padding. No pixel may touch or cross a cell edge.
+
+Background: 100% solid flat #FF00FF magenta in every cell, no gradient, no texture, no shadow, no ground plane.
+
+Avoid: character, hand, staff, UI, text, labels, watermark, frame numbers, extra projectiles, explosion, smoke cloud, photorealism, smooth vector art, painterly style, blurred glow, transparent background.
+
