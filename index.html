@@ -3,111 +3,349 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>源码架构资料索引</title>
+<title>游戏制作人资料主页</title>
 <style>
   :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --border: #30363d;
-    --text: #c9d1d9;
-    --muted: #8b949e;
-    --accent: #58a6ff;
-    --accent-2: #3fb950;
+    --bg: #f4efe5;
+    --paper: #fffaf0;
+    --ink: #22201c;
+    --muted: #756b60;
+    --line: #ded2bf;
+    --forest: #24594f;
+    --clay: #a85e34;
+    --gold: #c79a3a;
+    --blue: #365b8c;
+    --rose: #9f4f59;
+    --shadow: 0 18px 42px rgba(65, 48, 30, 0.13);
   }
+
   * { box-sizing: border-box; }
+
   body {
     margin: 0;
-    min-height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.7;
+    color: var(--ink);
+    background:
+      linear-gradient(rgba(244,239,229,0.88), rgba(244,239,229,0.96)),
+      radial-gradient(circle at 16% 12%, rgba(199,154,58,0.26), transparent 34%),
+      radial-gradient(circle at 85% 2%, rgba(36,89,79,0.18), transparent 28%),
+      var(--bg);
+    font-family: "Noto Serif SC", "Source Han Serif SC", "Microsoft YaHei", serif;
+    line-height: 1.72;
   }
-  main {
-    width: min(960px, calc(100% - 32px));
+
+  .page {
+    width: min(1180px, calc(100% - 32px));
     margin: 0 auto;
-    padding: 56px 0;
+    padding: 34px 0 58px;
   }
+
+  header {
+    min-height: 360px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    gap: 28px;
+    align-items: stretch;
+    margin-bottom: 24px;
+  }
+
+  .hero {
+    padding: 42px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background:
+      linear-gradient(135deg, rgba(255,250,240,0.94), rgba(250,241,224,0.78)),
+      repeating-linear-gradient(45deg, rgba(36,89,79,0.045) 0 1px, transparent 1px 14px);
+    box-shadow: var(--shadow);
+  }
+
+  .eyebrow {
+    margin: 0 0 16px;
+    color: var(--forest);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
   h1 {
-    margin: 0 0 12px;
-    font-size: clamp(28px, 4vw, 44px);
-    font-weight: 760;
+    max-width: 760px;
+    margin: 0 0 16px;
+    font-size: 46px;
+    line-height: 1.12;
     letter-spacing: 0;
   }
-  .intro {
-    margin: 0 0 32px;
+
+  .lead {
     max-width: 720px;
+    margin: 0;
     color: var(--muted);
-    font-size: 17px;
+    font-size: 18px;
   }
+
+  .dashboard {
+    display: grid;
+    gap: 12px;
+  }
+
+  .metric {
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 250, 240, 0.86);
+  }
+
+  .metric strong {
+    display: block;
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  .metric span {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .section {
+    margin-top: 24px;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    letter-spacing: 0;
+  }
+
+  .section-note {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
   }
-  a.card {
-    display: block;
-    min-height: 168px;
-    padding: 22px;
+
+  .card {
+    min-height: 188px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
     color: inherit;
     text-decoration: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     border-radius: 8px;
+    background: rgba(255, 250, 240, 0.9);
+    box-shadow: 0 8px 24px rgba(65, 48, 30, 0.08);
   }
-  a.card:hover,
-  a.card:focus-visible {
-    border-color: var(--accent);
+
+  .card:hover,
+  .card:focus-visible {
+    border-color: var(--clay);
     outline: none;
+    transform: translateY(-1px);
   }
+
   .tag {
-    display: inline-block;
-    margin-bottom: 16px;
-    color: var(--accent-2);
-    font-size: 13px;
-    font-weight: 700;
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: 14px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    color: #fff;
+    background: var(--forest);
+    font-size: 12px;
+    font-weight: 800;
   }
-  h2 {
+
+  .tag.research { background: var(--clay); }
+  .tag.external { background: var(--blue); }
+  .tag.asset { background: var(--forest); }
+  .tag.tech { background: var(--rose); }
+
+  h3 {
     margin: 0 0 10px;
-    font-size: 22px;
+    font-size: 20px;
+    line-height: 1.28;
     letter-spacing: 0;
   }
+
   .card p {
     margin: 0;
     color: var(--muted);
+    font-size: 14px;
+  }
+
+  .meta {
+    margin-top: 18px;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  @media (max-width: 920px) {
+    header,
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    h1 {
+      font-size: 36px;
+    }
+
+    .hero {
+      padding: 30px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .page {
+      width: min(100% - 24px, 1180px);
+      padding-top: 18px;
+    }
+
+    h1 {
+      font-size: 30px;
+    }
+
+    .section-head {
+      display: block;
+    }
   }
 </style>
 </head>
 <body>
-<main>
-  <h1>源码架构资料索引</h1>
-  <p class="intro">这里汇总五份可公开查阅的 HTML 文档。点击卡片即可打开对应页面。</p>
-  <section class="grid" aria-label="文档列表">
-    <a class="card" href="./deepseek-tui-vs-claude-code.html">
-      <span class="tag">对比分析</span>
-      <h2>DeepSeek TUI vs Claude Code</h2>
-      <p>源码架构对比详解，适合横向理解两个项目的设计取舍。</p>
-    </a>
-    <a class="card" href="./claude-code-architecture.html">
-      <span class="tag">架构详解</span>
-      <h2>Claude Code 源码架构详解</h2>
-      <p>由浅入深梳理 Claude Code 的源码结构、关键模块与运行机制。</p>
-    </a>
-    <a class="card" href="./feishu-cli-architecture.html">
-      <span class="tag">CLI 架构</span>
-      <h2>飞书 CLI 源码架构解析</h2>
-      <p>梳理飞书 CLI 的源码结构、核心模块与运行流程。</p>
-    </a>
-    <a class="card" href="./outputs/sprite-tests/pixel-island-scout-hero-action-consistency/qc/visual-report.html">
-      <span class="tag">Sprite QC</span>
-      <h2>主角跨动作一致性验收看板</h2>
-      <p>Sprite Forge 的可视化验收报告，包含动作预览、测量结果与结论摘要。</p>
-    </a>
-    <a class="card" href="./outputs/sprite-tests/pixel-island-scout-fx-boundary-test/qc/visual-report.html">
-      <span class="tag">FX QC</span>
-      <h2>特效验收面板</h2>
-      <p>FX boundary 测试报告，展示特效合格边界、预览图与结构化结论。</p>
-    </a>
+<main class="page">
+  <header>
+    <section class="hero">
+      <p class="eyebrow">Producer Workspace</p>
+      <h1>游戏项目资料主页</h1>
+      <p class="lead">这里集中存放项目研究、产品策略、外部优秀报告、资产验收与技术归档。当前主页按制作人日常工作流重新整理，方便快速进入关键材料。</p>
+    </section>
+    <aside class="dashboard" aria-label="资料概览">
+      <div class="metric"><strong>2</strong><span>项目研究与产品策略报告</span></div>
+      <div class="metric"><strong>2</strong><span>外部优秀 HTML 文档入口</span></div>
+      <div class="metric"><strong>3</strong><span>Sprite Forge 验收看板</span></div>
+      <div class="metric"><strong>3</strong><span>技术架构归档</span></div>
+    </aside>
+  </header>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>项目研究与产品策略</h2>
+      <p class="section-note">围绕玩法基座、商业化路径、验证方式和制作人决策。</p>
+    </div>
+    <div class="grid">
+      <a class="card" href="./game-research/three-role-dialogue-2026-05-30.html">
+        <div>
+          <span class="tag research">圆桌访谈</span>
+          <h3>花园世界基座 + X 前端路线三方圆桌访谈记录</h3>
+          <p>以三方对话方式梳理项目基座、前端路线、风险判断和共识结论。</p>
+        </div>
+        <div class="meta">2026-05-30</div>
+      </a>
+      <a class="card" href="./game-research/my-garden-world-us-project-2026-05-25.html">
+        <div>
+          <span class="tag research">产品研究</span>
+          <h3>《我的花园世界》产品机制研究与产品策略参考</h3>
+          <p>拆解产品结构、消耗模型、竞争路径、设计红线与 MVP 验证标准。</p>
+        </div>
+        <div class="meta">2026-05-25</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>外部优质文档</h2>
+      <p class="section-note">其他人总结得好的资料，保留原链接跳转。</p>
+    </div>
+    <div class="grid">
+      <a class="card" href="https://upy4l3m3qnegc.ok.kimi.link/#/">
+        <div>
+          <span class="tag external">Kimi 文档</span>
+          <h3>外部优秀 HTML 文档 A</h3>
+          <p>保留原始在线链接，作为项目调研与观点对照资料。</p>
+        </div>
+        <div class="meta">外部链接</div>
+      </a>
+      <a class="card" href="https://kblb6hdbtbfto.ok.kimi.link/">
+        <div>
+          <span class="tag external">Kimi 文档</span>
+          <h3>外部优秀 HTML 文档 B</h3>
+          <p>用于快速跳转到第三方总结材料，便于集中查阅。</p>
+        </div>
+        <div class="meta">外部链接</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>资产与验收看板</h2>
+      <p class="section-note">角色动作、特效边界和视觉验收相关资料。</p>
+    </div>
+    <div class="grid">
+      <a class="card" href="./outputs/sprite-tests/pixel-island-scout-hero-action-consistency/qc/visual-report.html">
+        <div>
+          <span class="tag asset">Sprite QC</span>
+          <h3>主角跨动作一致性验收看板</h3>
+          <p>角色动作一致性验收，包含动作预览、测量结果与结论摘要。</p>
+        </div>
+        <div class="meta">角色动作</div>
+      </a>
+      <a class="card" href="./outputs/sprite-tests/pixel-island-scout-fx-boundary-test/qc/visual-report.html">
+        <div>
+          <span class="tag asset">FX QC</span>
+          <h3>特效验收面板</h3>
+          <p>FX boundary 测试报告，展示特效合格边界、预览图与结构化结论。</p>
+        </div>
+        <div class="meta">特效边界</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>技术归档</h2>
+      <p class="section-note">仍然保留早期技术研究，作为工具链和架构参考。</p>
+    </div>
+    <div class="grid">
+      <a class="card" href="./deepseek-tui-vs-claude-code.html">
+        <div>
+          <span class="tag tech">架构对比</span>
+          <h3>DeepSeek TUI vs Claude Code</h3>
+          <p>源码架构对比详解，适合横向理解两个项目的设计取舍。</p>
+        </div>
+        <div class="meta">技术研究</div>
+      </a>
+      <a class="card" href="./claude-code-architecture.html">
+        <div>
+          <span class="tag tech">源码架构</span>
+          <h3>Claude Code 源码架构详解</h3>
+          <p>由浅入深梳理 Claude Code 的源码结构、关键模块与运行机制。</p>
+        </div>
+        <div class="meta">技术研究</div>
+      </a>
+      <a class="card" href="./feishu-cli-architecture.html">
+        <div>
+          <span class="tag tech">CLI 架构</span>
+          <h3>飞书 CLI 源码架构解析</h3>
+          <p>梳理飞书 CLI 的源码结构、核心模块与运行流程。</p>
+        </div>
+        <div class="meta">技术研究</div>
+      </a>
+    </div>
   </section>
 </main>
 </body>

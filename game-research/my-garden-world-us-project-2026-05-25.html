@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《我的花园世界》产品机制研究与产品策略参考 — 战略研究部</title>
+<style>
+/* ══════════════════════════════════════════════════════════════
+   战略研究部 · 创新组 · 内部 HTML 报告统一设计规范
+   版本：1.0.0  |  创建：2026-05-15
+   ══════════════════════════════════════════════════════════════ */
+
+/* ─── CSS Variable System ───────────────────────────────────── */
+:root {
+  /* 核心色彩 */
+  --primary:  #1a2744;
+  --accent:   #2563b0;
+  --bg:       #f3f5f8;
+  --card:     #ffffff;
+  --text:     #2d3436;
+  --muted:    #6b7280;
+  --border:   #e2e8f0;
+
+  /* 状态色 */
+  --ok:       #059669;
+  --ok-bg:    #ecfdf5;
+  --ok-bdr:   #a7f3d0;
+  --warn:     #d97706;
+  --warn-bg:  #fffbeb;
+  --warn-bdr: #fcd34d;
+  --danger:   #dc2626;
+  --danger-bg:#fff5f5;
+  --danger-bdr:#fca5a5;
+  --info:     #2563b0;
+  --info-bg:  #eff6ff;
+  --info-bdr: #bfdbfe;
+  --purple:   #7c3aed;
+  --purple-bg:#f5f3ff;
+  --purple-bdr:#ddd6fe;
+}
+
+/* ─── Reset & Base ──────────────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+/* ─── Layout ────────────────────────────────────────────────── */
+.page { max-width: 1120px; margin: 0 auto; padding: 48px 32px 96px; }
+
+/* ─── Page Header ───────────────────────────────────────────── */
+.page-header {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 36px 40px 28px;
+  margin-bottom: 8px;
+  border-bottom: 4px solid var(--accent);
+  box-shadow: 0 1px 6px rgba(0,0,0,.05);
+}
+.page-header .doc-type {
+  display: inline-block;
+  font-size: .72em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
+  background: var(--info-bg);
+  border: 1px solid var(--info-bdr);
+  padding: 3px 12px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+.page-header h1 {
+  font-size: 1.7em;
+  color: var(--primary);
+  line-height: 1.4;
+  margin-bottom: 12px;
+  font-weight: 800;
+}
+.page-header .sub {
+  font-size: .93em;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.55;
+}
+
+/* ─── Meta Info Bar ─────────────────────────────────────────── */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: .78em;
+  color: var(--muted);
+  padding: 12px 0 0;
+  border-top: 1px solid var(--border);
+}
+.meta span::before { content: attr(data-label) "\FF1A"; font-weight: 600; color: var(--primary); }
+
+/* ─── Section Card ──────────────────────────────────────────── */
+.section {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 34px 38px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 8px rgba(0,0,0,.05);
+  border-left: 5px solid var(--accent);
+}
+.section.ok     { border-left-color: var(--ok); }
+.section.warn   { border-left-color: var(--warn); }
+.section.danger { border-left-color: var(--danger); }
+.section.info   { border-left-color: var(--info); }
+.section.purple { border-left-color: var(--purple); }
+.section.gray   { border-left-color: var(--border); }
+
+/* ─── Section Intro ─────────────────────────────────────────── */
+.sec-intro {
+  font-size: .92em;
+  color: var(--muted);
+  margin: 6px 0 20px;
+  line-height: 1.6;
+}
+
+/* ─── Headings ──────────────────────────────────────────────── */
+h2 {
+  font-size: 1.26em;
+  color: var(--primary);
+  margin-bottom: 6px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+h3 { font-size: 1.04em; color: var(--accent); margin: 22px 0 10px; }
+h4 { font-size: .96em; font-weight: 700; margin: 14px 0 6px; color: var(--primary); }
+p  { margin-bottom: 10px; }
+ul, ol { margin: 6px 0 12px 22px; }
+li { margin-bottom: 5px; }
+strong { color: var(--primary); }
+code {
+  background: #edf2f7;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: .86em;
+  font-family: "SF Mono", Consolas, "Courier New", monospace;
+}
+
+/* ─── Callout Boxes ─────────────────────────────────────────── */
+.callout {
+  padding: 14px 18px;
+  border-radius: 0 8px 8px 0;
+  margin: 14px 0;
+  font-size: .92em;
+  line-height: 1.65;
+}
+.callout-info    { background: var(--info-bg);   border-left: 4px solid var(--info); }
+.callout-ok      { background: var(--ok-bg);     border-left: 4px solid var(--ok); }
+.callout-warn    { background: var(--warn-bg);   border-left: 4px solid var(--warn); }
+.callout-danger  { background: var(--danger-bg); border-left: 4px solid var(--danger); }
+.callout-purple  { background: var(--purple-bg); border-left: 4px solid var(--purple); }
+.callout-title   { font-weight: 700; margin-bottom: 5px; color: var(--primary); }
+
+/* ─── Status Tags ───────────────────────────────────────────── */
+.status {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: .76em;
+  font-weight: 700;
+  margin-right: 5px;
+  white-space: nowrap;
+}
+.status-ok     { background: #d1fae5; color: #065f46; }
+.status-warn   { background: #fef3c7; color: #92400e; }
+.status-danger { background: #fee2e2; color: #991b1b; }
+.status-info   { background: #dbeafe; color: #1e40af; }
+.status-purple { background: var(--purple-bg); color: #5b21b6; }
+.status-gray   { background: #f3f4f6; color: #374151; }
+
+/* ─── Card ──────────────────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border-radius: 9px;
+  padding: 20px 18px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.card.ok     { border-top: 3px solid var(--ok); }
+.card.warn   { border-top: 3px solid var(--warn); }
+.card.danger { border-top: 3px solid var(--danger); }
+.card.info   { border-top: 3px solid var(--info); }
+.card.purple { border-top: 3px solid var(--purple); }
+.card-label {
+  font-size: .72em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.card-text { font-size: .9em; line-height: 1.55; color: var(--primary); font-weight: 500; }
+
+/* ─── Grid Layouts ──────────────────────────────────────────── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 14px 0; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 14px 0; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 14px 0; }
+@media (max-width: 900px) { .grid-4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+@media (max-width: 540px) { .grid-4 { grid-template-columns: 1fr; } }
+
+/* ─── Table Wrapper ─────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; margin: 14px 0 18px; border-radius: 8px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: .87em; }
+thead { background: #f0f4f8; }
+th {
+  padding: 10px 13px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--primary);
+  border-bottom: 2px solid var(--border);
+}
+td { padding: 9px 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:nth-child(even) { background: #f8fafb; }
+tbody tr:hover { background: #eef1f6; }
+
+/* ─── Risk Card ─────────────────────────────────────────────── */
+.risk-card {
+  background: #fff8f8;
+  border-radius: 9px;
+  padding: 18px 20px;
+  border-left: 4px solid var(--danger);
+}
+.risk-card.mid { border-left-color: var(--warn); background: var(--warn-bg); }
+.risk-name { font-weight: 700; color: #991b1b; margin-bottom: 6px; font-size: .93em; }
+.risk-card.mid .risk-name { color: var(--warn); }
+.risk-label {
+  font-size: .73em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--muted);
+  margin: 6px 0 2px;
+}
+.risk-text { font-size: .87em; margin-bottom: 4px; line-height: 1.55; }
+
+/* ─── Action List ───────────────────────────────────────────── */
+.action-list {
+  background: var(--ok-bg);
+  border: 2px solid var(--ok-bdr);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin: 16px 0;
+}
+.action-list-title {
+  font-weight: 700;
+  font-size: 1em;
+  color: var(--ok);
+  margin-bottom: 14px;
+}
+.action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--ok-bdr);
+}
+.action-item:last-child { border: none; }
+.step-num {
+  min-width: 24px;
+  height: 24px;
+  background: var(--ok);
+  color: #fff;
+  border-radius: 50%;
+  font-size: .78em;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+.action-text { font-size: .9em; line-height: 1.55; }
+
+/* ─── Flow / Code Block ─────────────────────────────────────── */
+.flow-block {
+  background: #f8fafd;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 22px;
+  margin: 14px 0;
+  font-family: "SF Mono", Consolas, "Courier New", monospace;
+  font-size: .84em;
+  line-height: 1.9;
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--primary);
+}
+
+/* ─── TOC ───────────────────────────────────────────────────── */
+.toc {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 24px 32px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 8px rgba(0,0,0,.05);
+  border: 1px solid var(--border);
+}
+.toc h3 { margin-top: 0; font-size: .95em; color: var(--primary); }
+.toc ul, .toc ol { margin-left: 18px; list-style: none; }
+.toc li { margin-bottom: 4px; font-size: .9em; }
+.toc a { color: var(--accent); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* ─── Footer ────────────────────────────────────────────────── */
+footer {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--muted);
+  font-size: .79em;
+  line-height: 2;
+}
+
+/* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .page { padding: 20px 16px 60px; }
+  .page-header { padding: 24px 20px 18px; }
+  .page-header h1 { font-size: 1.35em; }
+  .section { padding: 22px 20px; }
+  .meta { gap: 6px 14px; }
+}
+
+/* ─── Highlight & Emphasis ─────────────────────────────────── */
+/* 关键结论高亮 */
+.key-point {
+  background: linear-gradient(transparent 60%, #bfdbfe 60%);
+  padding: 0 2px;
+  font-weight: 600;
+}
+.key-point--warn {
+  background: linear-gradient(transparent 60%, #fde68a 60%);
+  padding: 0 2px;
+  font-weight: 600;
+}
+.key-point--ok {
+  background: linear-gradient(transparent 60%, #a7f3d0 60%);
+  padding: 0 2px;
+  font-weight: 600;
+}
+/* 核心判断句加重 */
+.verdict {
+  font-size: 1.02em;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.6;
+}
+/* 章节末尾收束句 */
+.takeaway {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: #f0f4ff;
+  border-radius: 6px;
+  font-size: .9em;
+  color: var(--primary);
+  font-weight: 500;
+  line-height: 1.6;
+}
+.takeaway::before {
+  content: "→ 对项目意味着：";
+  font-weight: 700;
+  color: var(--accent);
+  margin-right: 4px;
+}
+/* 列表中的关键词着色 */
+li strong { color: var(--primary); }
+/* 表格第一列加重 */
+td > strong { color: var(--accent); }
+
+/* ─── Print ─────────────────────────────────────────────────── */
+@media print {
+  body { background: #fff; font-size: 13px; }
+  .page { padding: 20px; max-width: 100%; }
+  .section { box-shadow: none; break-inside: avoid; page-break-inside: avoid; }
+  .page-header { box-shadow: none; }
+  table { font-size: .82em; }
+  .key-point, .key-point--warn, .key-point--ok { background: none; text-decoration: underline; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══════════════════════════════════
+       PAGE HEADER
+       ══════════════════════════════════ -->
+  <div class="page-header">
+    <div class="doc-type">INTERNAL · 战略研究部</div>
+    <h1>《我的花园世界》产品机制研究与产品策略参考</h1>
+    <div class="sub">基于阶段性体验、社区观察、内部讨论和多轮辩论推演形成的机制拆解与产品策略参考</div>
+    <div class="meta">
+      <span data-label="版本">2.1</span>
+      <span data-label="日期">2026-05-25</span>
+      <span data-label="证据分布">A类15% B类35% C类50%</span>
+    </div>
+    <div class="meta" style="margin-top:6px;">
+      <span data-label="适用对象">公司管理层 / 制作人 / 策划 / 发行业务线相关人员</span>
+    </div>
+    <div class="meta" style="margin-top:4px;">
+      <span data-label="适用场景">美国版产品策略讨论 / 机制复刻判断 / 题材画风与买量测试前置阅读 / 项目组内部对齐</span>
+    </div>
+    <div class="meta" style="margin-top:4px;">
+      <span data-label="数据边界">本报告基于机制分析和体验观察，暂未纳入《我的花园世界》完整商业数据</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SUMMARY GRID
+       ══════════════════════════════════ -->
+  <div class="grid-3" style="margin-bottom:20px">
+    <div class="card info">
+      <div class="card-label">机制判断</div>
+      <div class="card-text">低压经营<br>极致消耗<br>公会异步任务型GVG<br>大通服</div>
+    </div>
+    <div class="card warn">
+      <div class="card-label">核心风险</div>
+      <div class="card-text">题材画风吸量程度与购买欲<br>付费动机与付费意愿<br>社交路径与内容产能</div>
+    </div>
+    <div class="card ok">
+      <div class="card-label">下一步</div>
+      <div class="card-text">题材画风买量测试<br>MVP分阶段验证</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       TOC
+       ══════════════════════════════════ -->
+  <div class="toc">
+    <h3>目录</h3>
+    <ul style="list-style:none">
+      <li><a href="#s1">一、核心结论</a></li>
+      <li><a href="#s2">二、产品结构：四层机制</a></li>
+      <li><a href="#s3">三、极致消耗模型</a></li>
+      <li><a href="#s4">四、与传统养成对比</a></li>
+      <li><a href="#s5">五、六面承重墙</a></li>
+      <li><a href="#s6">六、从低压经营到公会竞争的渐进路径</a></li>
+      <li><a href="#s7">七、设计红线与商业前提</a></li>
+      <li><a href="#s8">八、行业趋势：休闲入口嫁接中重度运营</a></li>
+      <li><a href="#s9">九、MVP验证与失败判据</a></li>
+    </ul>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 1 — 核心结论
+       ══════════════════════════════════ -->
+  <div class="section info" id="s1">
+    <h2>一、核心结论</h2>
+
+    <div class="callout callout-info">
+      <p class="verdict">《我的花园世界》不是传统养成的轻量化版本，也不是纯休闲种花游戏。</p>
+      <p style="margin-top:8px;">它是一套把<span class="key-point">低压经营入口</span>、<span class="key-point">极致资源消耗</span>、<span class="key-point">公会异步任务型GVG</span>、<span class="key-point">横向收集展示</span>和<span class="key-point">大通服社交</span>组合在一起的长线结构。</p>
+    </div>
+
+    <ol>
+      <li><span class="key-point">极致的消耗模型</span>。日常订单/任务接近无上限，玩家长期处于"有花但不够用"的状态。<span class="status status-info">A</span></li>
+      <li><span class="key-point">公会竞赛是需求放大器</span>。内部定义为"低协同、弱对抗、高覆盖、强分层、低焦虑的GVE型GVG"。它放大的是图鉴收集需求和资源用途优先级，而不是单纯增加消耗量。<span class="status status-info">A+C</span></li>
+      <li>付费玩家的社交角色是<span class="key-point--ok">"被需要"</span>，而不是"压制别人"。付费买的是可见性、反馈性和社会比较，不是传统意义上的战力碾压。<span class="status status-purple">B+C</span></li>
+      <li><span class="key-point">大通服成立需要四层条件同时满足</span>：消耗层、资产层、匹配层、时间层。<span class="status status-purple">C</span></li>
+      <li>前期重点不是一次性展示全部系统，而是先让玩家觉得经营过程<span class="key-point--ok">轻松、顺手、可随时回来</span>，逐步形成日常习惯。<span class="status status-info">A</span></li>
+      <li>社交不是从公会才开始。雇佣、摸花、花贸市场等系统先让玩家接受"别人和我的经营有关"。<span class="status status-info">A</span></li>
+      <li>从低压经营到公会竞争，不是突然跳转，而是经过<span class="key-point--warn">"低压习惯→低侵入交互→组织贡献"</span>的渐进过程。<span class="status status-purple">C</span></li>
+      <li>美国版应优先复刻机制结构，但必须验证<span class="key-point--warn">题材画风、审美购买欲、社交路径、内容产能和买量效率</span>。<span class="status status-purple">C</span></li>
+    </ol>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 2 — 产品结构：四层机制
+       ══════════════════════════════════ -->
+  <div class="section info" id="s2">
+    <h2>二、产品结构：四层机制</h2>
+    <p class="sec-intro">产品定位：用低压经营入口获取泛用户，用公会组织竞争留住中重度用户并变现。经营养成+个人社交部分能单独成立。</p>
+
+    <div class="grid-2">
+      <div class="card info">
+        <div class="card-label">第一层：低压经营入口</div>
+        <div class="card-text" style="line-height:1.8;">
+          <strong>种花、收花、订单、布置、收集</strong><br>
+          前期完成习惯养成，让经营变成日常条件反射。不进公会也能形成完整循环。
+        </div>
+      </div>
+      <div class="card ok">
+        <div class="card-label">第二层：横向收集和展示</div>
+        <div class="card-text" style="line-height:1.8;">
+          <strong>花灵、限定花、装饰、称号</strong><br>
+          让付费更接近审美消费、收藏消费、为公会贡献消费，而不是传统个人战力提升。
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card purple">
+        <div class="card-label">第三层：公会异步任务型GVG</div>
+        <div class="card-text" style="line-height:1.8;">
+          <strong>"低协同、弱对抗、高覆盖、强分层、低焦虑"</strong><br>
+          异步任务制，每人有限次数，每周竞赛。把个人经营转译为组织贡献。
+        </div>
+      </div>
+      <div class="card warn">
+        <div class="card-label">第四层：极致消耗引擎</div>
+        <div class="card-text" style="line-height:1.8;">
+          <strong>日常订单 + 活动任务 + 公会竞赛限时任务</strong><br>
+          接近无限的订单持续消耗库存，竞赛驱动图鉴扩展和当期付费。玩家长期处于"有事可做、但永远不富余"的状态。
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 3 — 极致消耗模型
+       ══════════════════════════════════ -->
+  <div class="section purple" id="s3">
+    <h2>三、极致消耗模型</h2>
+    <p class="sec-intro">本章解释：为什么玩家永远有事可做、永远缺资源，以及这套消耗是如何驱动付费的。</p>
+
+    <h3>消耗结构</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>消耗出口</th>
+            <th>消耗对象</th>
+            <th>对谁有压力</th>
+            <th>付费驱动</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>日常订单（居民/顾客/宫廷/组团）</strong></td>
+            <td>花材库存</td>
+            <td>所有活跃玩家</td>
+            <td>时间加速+花材补充</td>
+          </tr>
+          <tr>
+            <td><strong>公会竞赛-中低难度任务</strong></td>
+            <td>花材库存（限时）</td>
+            <td>平民/微氪</td>
+            <td>加速+库存补充</td>
+          </tr>
+          <tr>
+            <td><strong>公会竞赛-高分任务</strong></td>
+            <td>当期付费花</td>
+            <td>中高R</td>
+            <td>当期周花礼包/限定花购买</td>
+          </tr>
+          <tr>
+            <td><strong>活动/限定任务</strong></td>
+            <td>特定花材+元宝</td>
+            <td>追求限定内容的玩家</td>
+            <td>活动礼包+加速</td>
+          </tr>
+          <tr>
+            <td><strong>花灵/图鉴培育</strong></td>
+            <td>培育材料+时间</td>
+            <td>收集型玩家</td>
+            <td>培育加速+材料购买</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>持续消耗如何成立</h3>
+    <p>玩家养成积累的是<span class="key-point">图鉴广度和种植效率</span>，不是可部署的战力存量。订单系统持续消耗库存，玩家需要提前储备大量资源以应对不同任务，因此<span class="key-point--ok">24小时都可以有事可做</span>。</p>
+    <p style="color:var(--muted);font-size:.9em;">当前怀疑系统存在根据玩家库存动态推送订单的机制，但这仍是C类推演，需要后续验证。<span class="status status-purple">C</span></p>
+
+    <h3>非累计式任务：消耗设计的结构性保障 <span class="status status-info">A</span></h3>
+    <p>主线和活动任务中存在大量非累计式任务——每次都从零开始消耗资源，历史积累不能减免当次消耗。</p>
+    <ul>
+      <li>历史积累不能减免当次消耗</li>
+      <li>反复消耗同类资源</li>
+      <li>库存管理成为核心能力——"有花"不等于"够用"</li>
+      <li>前期训练玩家从"完成任务"转向"管理资源"</li>
+    </ul>
+
+    <h3>与Gossip Harbor的结构对比</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>Gossip Harbor</th>
+            <th>花园世界</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>消耗瓶颈</strong></td>
+            <td>时间/能量</td>
+            <td>库存品类</td>
+          </tr>
+          <tr>
+            <td><strong>付费心理</strong></td>
+            <td>即时冲动型</td>
+            <td>规划焦虑型</td>
+          </tr>
+          <tr>
+            <td><strong>加速机制</strong></td>
+            <td>能量倍增器(x2/x4/x8)</td>
+            <td>公会竞赛高分任务需要当期付费花</td>
+          </tr>
+          <tr>
+            <td><strong>社交消耗层</strong></td>
+            <td>无</td>
+            <td>公会竞赛+组团订单</td>
+          </tr>
+          <tr>
+            <td><strong>无底洞形态</strong></td>
+            <td>单层（个人速度）</td>
+            <td>双层（日常库存+图鉴扩展）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 4 — 与传统养成对比
+       ══════════════════════════════════ -->
+  <div class="section gray" id="s4">
+    <h2>四、与传统养成对比</h2>
+    <p class="sec-intro">本章说明：花园世界和我们熟悉的传统养成项目有什么根本区别，为什么不能照搬传统养成的做法。</p>
+
+    <h3>万岁爷运营引擎</h3>
+    <p>每3天一轮，10轮 = 30天赛季。<br>每轮同时开启：数值冲榜 + 跨服副本 + 小游戏 + 促销 + 限时活动 + 外显投放。<br>底层逻辑：增量式强制消耗 + 多维数值轮转 + 榜单压力变现。</p>
+
+    <h3>根本区别</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>传统养成（万岁爷）</th>
+            <th>花园世界</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>核心驱动</strong></td>
+            <td>资源运营+个人PVP冲榜</td>
+            <td>PVE收集经营+异步任务型GVG</td>
+          </tr>
+          <tr>
+            <td><strong>数值结构</strong></td>
+            <td>存量数值长期有效，同时通过周期活动制造增量消耗</td>
+            <td>图鉴广度、种植效率和库存消耗为主，弱化直接战力碾压</td>
+          </tr>
+          <tr>
+            <td><strong>竞争方式</strong></td>
+            <td>个人榜单、跨服数值比拼</td>
+            <td>公会竞赛、小范围段位、按实力贡献</td>
+          </tr>
+          <tr>
+            <td><strong>氪金影响</strong></td>
+            <td>氪金→压制→平民被挤出</td>
+            <td>氪金→收集展示+社交价值→被靠近</td>
+          </tr>
+          <tr>
+            <td><strong>时间绑定</strong></td>
+            <td>3天/轮无休息日</td>
+            <td>每周有限次数，时间自由</td>
+          </tr>
+          <tr>
+            <td><strong>回归体验</strong></td>
+            <td>流失=落后，需换号或追赶</td>
+            <td>零摩擦回归，缺席不惩罚</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">关键判断 [C]</div>
+      <p>把竞争单位从个人换成公会，把<span class="key-point">"我比你强"换成"我们队比他们队强"</span>，把<span class="key-point--warn">"氪金=碾压"换成"氪金=被需要"</span>。</p>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 5 — 六面承重墙
+       ══════════════════════════════════ -->
+  <div class="section ok" id="s5">
+    <h2>五、六面承重墙</h2>
+    <p class="sec-intro">核心策略：<span class="key-point">不轻易改产品机制和数值设计</span>。以下是复刻过程中不能走形的关键设计。</p>
+
+    <div class="table-wrap">
+      <table style="table-layout:fixed;">
+        <colgroup>
+          <col style="width:22%">
+          <col style="width:40%">
+          <col style="width:38%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>承重墙</th>
+            <th>本质</th>
+            <th>改错了会怎样</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>一、双层结构</strong></td>
+            <td>第一层独立成立，第二层驱动变现，两层衔接自然</td>
+            <td>第一层太薄→留存崩；第二层太早→用户流失</td>
+          </tr>
+          <tr>
+            <td><strong>二、竞赛是需求放大器</strong></td>
+            <td>放大图鉴收集需求；限时压力让库存不能松懈</td>
+            <td>竞赛跟花种消耗脱钩→商业化断裂</td>
+          </tr>
+          <tr>
+            <td><strong>三、氪金=被需要</strong></td>
+            <td>高氪跟普通玩家共生不对立</td>
+            <td>加入数值碾压→大通服崩塌</td>
+          </tr>
+          <tr>
+            <td><strong>四、每周+次数有限</strong></td>
+            <td>有目标但不绑每天，时间自由</td>
+            <td>变日常→倦怠；次数无限→纯氪金竞赛</td>
+          </tr>
+          <tr>
+            <td><strong>五、资产跟人走</strong></td>
+            <td>高流动+低损失+竞赛期锁定</td>
+            <td>资产绑公会→被困→爆发性流失</td>
+          </tr>
+          <tr>
+            <td><strong>六、大通服+小池匹配</strong></td>
+            <td>社交池大+竞争可控+永远不鬼服</td>
+            <td>分服→鬼服；匹配不当→无竞争感</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>大通服成立的四层条件：</strong><span class="status status-purple">C</span></p>
+    <ul>
+      <li><strong>消耗层</strong>——资源被持续吃掉，老玩家不会囤出碾压性存量</li>
+      <li><strong>资产层</strong>——积累的是图鉴和效率，不是直接攻击别人的战力</li>
+      <li><strong>匹配层</strong>——小范围公会竞争，避免全服碾压</li>
+      <li><strong>时间层</strong>——缺席不产生进度惩罚，回归零摩擦</li>
+    </ul>
+
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 6 — 从低压经营到公会竞争的渐进路径
+       ══════════════════════════════════ -->
+  <div class="section purple" id="s6">
+    <h2>六、从低压经营到公会竞争的渐进路径</h2>
+    <p class="sec-intro">本章说明：玩家是如何从纯单机种花一步步进入公会竞争的——不只是被社交吸引，更是因为公会能提供更多资源获取渠道。</p>
+
+    <h3>前期：建立低压经营习惯 <span class="status status-info">A</span></h3>
+    <ul>
+      <li><strong>碎片化时间切割</strong><br>种植成熟压缩至极短，操作变成条件反射</li>
+      <li><strong>密集奖励</strong><br>弹窗、经验跳动、物品掉落不断发送即时反馈</li>
+      <li><strong>零摩擦回归</strong><br>几个月不玩状态完美保留，"花园在等你回来"</li>
+      <li><strong>低焦虑设计</strong><br>不枯萎、不强惩罚、资源相对充足，<br>让玩家先觉得轻松、可控、不会亏</li>
+    </ul>
+
+    <h3>资源需求递增：进入公会的真实驱动力 <span class="status status-info">A</span></h3>
+    <p>玩家进入公会的前期动力不是"想社交"，而是<span class="key-point">资源不够用了，公会能提供更多获取渠道</span>：</p>
+    <ul>
+      <li><strong>公会土地</strong>——高收益种植区域，必须加入公会才能使用</li>
+      <li><strong>公会商店</strong>——培育材料兑换，公会等级越高折扣越多</li>
+      <li><strong>公会竞赛奖励</strong>——稀有种子、加速道具、竞赛币兑换</li>
+      <li><strong>鲜花分享</strong>——稀有花种的获取途径</li>
+    </ul>
+    <p>也就是说：玩家发现"不加公会我资源来源更少"→自然产生加入动机。社交归属感是后期在公会待久了之后的副产物，不是前期驱动力。</p>
+
+    <h3>低侵入交互：公会前的过渡铺垫 <span class="status status-info">A</span></h3>
+    <p>雇佣、摸花、花贸市场等系统不只是公会前置教学，它们本身就是独立成立的经营模块。但它们同时让玩家提前接受了一件事："其他玩家能给我资源"。</p>
+    <ol>
+      <li><strong>雇佣采珍珠：</strong>好友=资源产出节点</li>
+      <li><strong>摸花/互访：</strong>别人的花园=额外收益来源</li>
+      <li><strong>花贸市场：</strong>玩家间资源交换形成经济关系</li>
+    </ol>
+    <p>等到公会解锁时，玩家已经习惯了"别人对我有用"，加入公会只是把这个逻辑升级为组织关系。</p>
+
+    <h3>目标用户与设计策略 <span class="status status-info">A</span></h3>
+    <p>内部判断，《我的花园世界》的用户中包含宝妈、30+女性等低压经营用户，她们的核心需求是<span class="key-point">低门槛、低焦虑、低侵入社交</span>。这类用户不会主动寻求公会竞争，但可以被资源需求逐步引导进入。</p>
+    <p style="margin-top:14px;"><strong>设计策略：</strong>先让玩家形成经营习惯→通过资源瓶颈让她们发现别人有用→通过公会资源优势让她们自愿加入→公会竞赛在已有经营循环里<span class="key-point--ok">自然出现</span>。社交归属感是留久了之后的结果，不是进入的原因。</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">关键约束</div>
+      <p>如果跳过中间的资源引导和轻交互铺垫，直接从种花进入公会竞赛，玩家会觉得突兀。</p>
+      <p style="margin-top:10px;">要复刻的是<span class="key-point--warn">"经营习惯 → 资源需求递增 → 发现公会有用 → 组织贡献"</span>这条渐进路径。</p>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 7 — 设计红线与商业前提
+       ══════════════════════════════════ -->
+  <div class="section warn" id="s7">
+    <h2>七、设计红线与商业前提</h2>
+    <p class="sec-intro">不改机制，但限定运营和表达边界。</p>
+
+    <h3>设计红线</h3>
+    <div class="callout callout-warn">
+      <div class="callout-title">美国版设计红线</div>
+      <ol>
+        <li><strong>经营养成必须独立成立。</strong><br>不进公会的玩家也有完整体验和长期目标。</li>
+        <li><strong>限定花不垄断高价值任务。</strong><br>不买当期新花也能完成有意义的公会贡献。<br>花园世界现有表现支持该结构具备可持续性，但美国版仍需监控。</li>
+        <li><strong>错过无严重惩罚。</strong><br>可以损失进度，但不论什么时候继续游戏，都应能获得正常体验。</li>
+        <li><strong>被公会踢的体验安全网默认做。</strong><br>包括重新匹配引导、资产无损告知、踢人确认流程。</li>
+      </ol>
+    </div>
+
+    <h3>商业前提 <span class="status status-purple">C</span></h3>
+    <p><strong><span class="key-point--warn">审美与物件欲望必须本地成立。</span></strong></p>
+    <p>经营对象必须让美国用户愿意长期收集、展示和付费。如果物件欲望不成立，公会竞赛仍能运转，但付费会变成纯任务压力而非主动消费。</p>
+
+    <h3>商业化方向：购物感与社会地位价值</h3>
+    <p>花园主题天然让付费感知更接近购物。"我买了一朵好看的花"比"我买了碾压别人的力量"更容易被休闲用户接受。</p>
+    <p>底层理论支撑 <span class="status status-info">A</span>：玩家付费买的核心不是数值，而是<span class="key-point">可见性、反馈性和社会比较</span>。</p>
+    <ul>
+      <li>付费首先直接提供美观、收集、便利</li>
+      <li>付费内容有展示场景——花园参观、好友可见、公会主页</li>
+      <li>摸花、互访、参观构成社交反馈循环</li>
+      <li>稀有花、限定花、绝版花制造差异</li>
+      <li>持续提供新的稀缺性内容——<br>社会地位价值若想长期存在，需要持续投入</li>
+      <li>付费路径递进且自愿：<br>免费可玩 → 小额便利 → 图鉴收集 → 即时购买</li>
+    </ul>
+
+    <h3>治理责任</h3>
+    <p>暂时交给玩家，不轻易改。花园世界把系统摩擦转化为玩家间社交动力。</p>
+    <p style="margin-top:10px;">上线后需监控：</p>
+    <ul>
+      <li>被踢→卸载率、差评率</li>
+      <li>招募帖是否要求买周花</li>
+      <li>玩家是否用"拖后腿"评价不付费的人</li>
+      <li>中低段位公会是否仍有目标感</li>
+    </ul>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 8 — 行业趋势：休闲入口嫁接中重度运营
+       ══════════════════════════════════ -->
+  <div class="section gray" id="s8">
+    <h2>八、行业趋势：休闲入口嫁接中重度运营</h2>
+    <p class="sec-intro">以Gossip Harbor为代表，叠加X+SLG、柠檬微趣旗下多款产品等案例，<span class="key-point--ok">"休闲入口+中重度运营"在美国市场不是偶然现象，而是已被多类产品反复验证的出海方向</span>。<span class="status status-purple">B+C</span></p>
+
+    <h3>Gossip Harbor核心数据 <span class="status status-purple">B</span></h3>
+    <ul>
+      <li>2025年总流水约6.5亿美元（Sensor Tower数据，需二次核验）</li>
+      <li>iOS全球约60万评价4.58分，美国区4.6分</li>
+      <li>月均流水约5400万美元，月复合增长约9%</li>
+      <li>团队约200-300人，每月约4次更新</li>
+    </ul>
+
+    <h3>当前竞争焦点 <span class="status status-purple">B+C</span></h3>
+    <p>"休闲入口+中重度运营"方向已进入多产品竞争阶段，差异化不再是方向选择，而是执行细节。当前竞争集中在：</p>
+    <ul>
+      <li>谁的基础玩法更顺——前三分钟体验直接影响留存曲线</li>
+      <li>谁的内容产能更稳定——活动频率和质量决定长线收入</li>
+      <li>谁的商业化深度更强——能否在不破坏体验的前提下持续变现</li>
+      <li>谁的买量素材与产品内容联动更好——素材承诺和游戏体验一致性</li>
+      <li>谁能长期维持用户不反感——运营节奏不让用户产生倦怠或被索取感</li>
+    </ul>
+
+    <h3>对美国版的启发 <span class="status status-purple">C</span></h3>
+    <ol>
+      <li>欧美休闲用户可以接受中重度运营，但前提是底层手感顺滑</li>
+      <li>活动内容产能是生死线，高频活动直接影响收入增长</li>
+      <li>核心玩法和数值底座必须足够有弹性，能承载活动堆叠而不让经济崩溃</li>
+      <li>花园世界比Gossip Harbor多一层社交竞争，同样做极致消耗，但多了组织目标和社群认可</li>
+    </ol>
+
+    <div class="callout callout-purple">
+      <p>花园世界和Gossip Harbor的核心差异不在消耗深度——两者都是无底洞。</p>
+      <p style="margin-top:10px;">差异在于：花园世界把<span class="key-point">"个人资源无底洞"</span>和<span class="key-point--ok">"组织贡献理由"</span>接在一起，让持续消耗更容易被理解为经营目标、社交贡献和展示价值。</p>
+    </div>
+
+    <div class="takeaway">方向已被验证可行，关键在于我们的手感、产能和买量闭环能不能跟上已有竞品。</div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 9 — MVP验证与失败判据
+       ══════════════════════════════════ -->
+  <div class="section info" id="s9">
+    <h2>九、MVP验证与失败判据</h2>
+    <p class="sec-intro">分阶段验证，每段有失败判据。</p>
+
+    <h3>阶段0：题材画风与买量素材验证（前置/并行）</h3>
+    <div class="grid-3" style="margin-top:14px;">
+      <div class="card info" style="padding:16px 18px;">
+        <div class="card-label" style="margin-bottom:10px;">验证问题</div>
+        <ul style="margin:0;padding-left:16px;font-size:.88em;">
+          <li>美国用户是否被经营对象、画风和视觉钩子吸引</li>
+          <li>买量成本相较其他产品是否有优势</li>
+          <li>题材能否支撑持续活动素材产出</li>
+        </ul>
+      </div>
+      <div class="card" style="padding:16px 18px;">
+        <div class="card-label" style="margin-bottom:10px;">验证方式</div>
+        <ul style="margin:0;padding-left:16px;font-size:.88em;">
+          <li>静态图/短视频素材测试</li>
+          <li>多题材、多画风、多视觉钩子对比</li>
+          <li>与公司其他产品做成本对照</li>
+          <li>发行、中台、研发共同复盘</li>
+        </ul>
+      </div>
+      <div class="card warn" style="padding:16px 18px;">
+        <div class="card-label" style="margin-bottom:10px;">失败判据</div>
+        <ul style="margin:0;padding-left:16px;font-size:.88em;">
+          <li>素材点击和转化明显弱于对照组</li>
+          <li>买量成本无法支撑长线运营</li>
+          <li>题材能吸量但无法支撑经营和公会任务</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px;">阶段1至3</h3>
+    <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-left:4px solid var(--info);border-radius:8px;padding:16px 20px;display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:16px;align-items:start;">
+        <strong style="color:var(--accent);font-size:.9em;white-space:nowrap;">阶段1<br>低压经营</strong>
+        <div style="font-size:.87em;"><strong style="color:var(--muted);font-size:.8em;display:block;margin-bottom:4px;">验证问题</strong>是否愿意种、收、布置？习惯是否养成？</div>
+        <div style="font-size:.87em;"><strong style="color:var(--muted);font-size:.8em;display:block;margin-bottom:4px;">验证方式</strong>核心循环原型测试</div>
+        <div style="font-size:.87em;"><strong style="color:var(--muted);font-size:.8em;display:block;margin-bottom:4px;">失败判据</strong>D1/D3留存不达标、玩家对种花和收集没有持续兴趣 → 题材手感不成立</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-left:4px solid var(--purple);border-radius:8px;padding:16px 20px;display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:16px;align-items:start;">
+        <strong style="color:var(--accent);font-size:.9em;white-space:nowrap;">阶段2<br>经营→公会</strong>
+        <div style="font-size:.87em;"><strong style="color:var(--muted);font-size:.8em;display:block;margin-bottom:4px;">验证问题</strong>是否理解"我种的东西能帮公会"？低侵入交互是否建立？</div>
+        <div style="font-size:.87em;"><strong style="color:var(--muted);font-size:.8em;display:block;margin-bottom:4px;">验证方式</strong>最小公会原型 + 低侵入交互系统</div>
+        <div style="font-size:.87em;"><strong style="color:var(--muted);font-size:.8em;display:block;margin-bottom:4px;">失败判据</strong>不理解关联、觉得公会突兀 → 渐进路径缺失</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:8px;padding:16px 20px;display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:16px;align-items:start;">
+        <strong style="color:var(--accent);font-size:.9em;white-space:nowrap;">阶段3<br>公会放大购买欲</strong>
+        <div style="font-size:.87em;"><strong style="color:var(--muted);font-size:.8em;display:block;margin-bottom:4px;">验证问题</strong>付费动机是"喜欢+贡献"还是"怕拖累"？</div>
+        <div style="font-size:.87em;"><strong style="color:var(--muted);font-size:.8em;display:block;margin-bottom:4px;">验证方式</strong>完整竞赛 + 商店封测</div>
+        <div style="font-size:.87em;"><strong style="color:var(--muted);font-size:.8em;display:block;margin-bottom:4px;">失败判据</strong>公会任务未能让玩家产生"我想买当期新花"的欲望，而是产生"不买就跟不上"的压力 → 需求放大器变成了付费压迫器</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       FOOTER
+       ══════════════════════════════════ -->
+  <footer>
+    生成时间：2026-05-25 | 信息截止日期：2026-05-25<br>
+    证据分布：A类 15% / B类 35% / C类 50%<br>
+    研究底稿：reports/special/2026-05-23_my_garden_world_phase_review.md<br>
+    背景知识包：knowledge/project_research/my_garden_world/
+  </footer>
+
+</div>
+</body>
+</html>
