@@ -6,17 +6,18 @@
 <title>游戏制作人资料主页</title>
 <style>
   :root {
-    --bg: #f4efe5;
-    --paper: #fffaf0;
-    --ink: #22201c;
-    --muted: #756b60;
-    --line: #ded2bf;
-    --forest: #24594f;
-    --clay: #a85e34;
-    --gold: #c79a3a;
-    --blue: #365b8c;
-    --rose: #9f4f59;
-    --shadow: 0 18px 42px rgba(65, 48, 30, 0.13);
+    --bg: #f3efe6;
+    --paper: #fffaf1;
+    --paper-2: #fbf2e2;
+    --ink: #23201b;
+    --muted: #746b5f;
+    --line: #ddcfba;
+    --forest: #245b50;
+    --clay: #a85832;
+    --blue: #355b87;
+    --moss: #667b3a;
+    --wine: #8b4a54;
+    --shadow: 0 18px 42px rgba(63, 45, 24, 0.12);
   }
 
   * { box-sizing: border-box; }
@@ -25,9 +26,9 @@
     margin: 0;
     color: var(--ink);
     background:
-      linear-gradient(rgba(244,239,229,0.88), rgba(244,239,229,0.96)),
-      radial-gradient(circle at 16% 12%, rgba(199,154,58,0.26), transparent 34%),
-      radial-gradient(circle at 85% 2%, rgba(36,89,79,0.18), transparent 28%),
+      linear-gradient(135deg, rgba(243,239,230,0.92), rgba(238,229,213,0.96)),
+      radial-gradient(circle at 12% 8%, rgba(168,88,50,0.16), transparent 28%),
+      radial-gradient(circle at 88% 0%, rgba(36,91,80,0.16), transparent 32%),
       var(--bg);
     font-family: "Noto Serif SC", "Source Han Serif SC", "Microsoft YaHei", serif;
     line-height: 1.72;
@@ -36,30 +37,38 @@
   .page {
     width: min(1180px, calc(100% - 32px));
     margin: 0 auto;
-    padding: 34px 0 58px;
-  }
-
-  header {
-    min-height: 360px;
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-    gap: 28px;
-    align-items: stretch;
-    margin-bottom: 24px;
+    padding: 34px 0 64px;
   }
 
   .hero {
-    padding: 42px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+    gap: 18px;
+    margin-bottom: 26px;
+  }
+
+  .hero-main,
+  .focus-panel,
+  .section {
     border: 1px solid var(--line);
     border-radius: 8px;
-    background:
-      linear-gradient(135deg, rgba(255,250,240,0.94), rgba(250,241,224,0.78)),
-      repeating-linear-gradient(45deg, rgba(36,89,79,0.045) 0 1px, transparent 1px 14px);
+    background: rgba(255, 250, 241, 0.92);
     box-shadow: var(--shadow);
   }
 
+  .hero-main {
+    min-height: 300px;
+    padding: 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background:
+      linear-gradient(135deg, rgba(255,250,241,0.96), rgba(251,242,226,0.86)),
+      repeating-linear-gradient(0deg, rgba(36,91,80,0.04) 0 1px, transparent 1px 18px);
+  }
+
   .eyebrow {
-    margin: 0 0 16px;
+    margin: 0 0 14px;
     color: var(--forest);
     font-size: 13px;
     font-weight: 800;
@@ -68,56 +77,97 @@
   }
 
   h1 {
-    max-width: 760px;
     margin: 0 0 16px;
-    font-size: 46px;
+    max-width: 760px;
+    font-size: 48px;
     line-height: 1.12;
     letter-spacing: 0;
   }
 
   .lead {
-    max-width: 720px;
     margin: 0;
+    max-width: 780px;
     color: var(--muted);
     font-size: 18px;
   }
 
-  .dashboard {
+  .hero-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 26px;
+  }
+
+  .hero-links a {
+    padding: 8px 12px;
+    color: var(--ink);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .hero-links a:hover,
+  .hero-links a:focus-visible {
+    border-color: var(--clay);
+    outline: none;
+  }
+
+  .focus-panel {
+    padding: 24px;
+    background: rgba(251, 242, 226, 0.92);
+  }
+
+  .focus-panel h2 {
+    margin: 0 0 14px;
+    font-size: 22px;
+  }
+
+  .focus-list {
     display: grid;
     gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .metric {
-    padding: 18px 20px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: rgba(255, 250, 240, 0.86);
+  .focus-list li {
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
   }
 
-  .metric strong {
+  .focus-list li:first-child { border-top: 0; }
+
+  .focus-list strong {
     display: block;
-    font-size: 28px;
-    line-height: 1.1;
+    margin-bottom: 3px;
+    font-size: 15px;
   }
 
-  .metric span {
+  .focus-list span {
+    display: block;
     color: var(--muted);
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .section {
-    margin-top: 24px;
+    margin-top: 18px;
+    padding: 24px;
   }
 
   .section-head {
     display: flex;
-    align-items: end;
+    align-items: flex-end;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
   }
 
-  h2 {
+  .section h2 {
     margin: 0;
     font-size: 24px;
     letter-spacing: 0;
@@ -129,37 +179,34 @@
     font-size: 14px;
   }
 
-  .grid {
+  .cards {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .card {
-    min-height: 188px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 20px;
+    min-height: 158px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 10px;
+    padding: 18px;
     color: inherit;
     text-decoration: none;
     border: 1px solid var(--line);
     border-radius: 8px;
-    background: rgba(255, 250, 240, 0.9);
-    box-shadow: 0 8px 24px rgba(65, 48, 30, 0.08);
+    background: rgba(255, 255, 255, 0.42);
   }
 
   .card:hover,
   .card:focus-visible {
     border-color: var(--clay);
+    background: rgba(255, 255, 255, 0.66);
     outline: none;
-    transform: translateY(-1px);
   }
 
   .tag {
-    display: inline-flex;
     width: fit-content;
-    margin-bottom: 14px;
     padding: 3px 9px;
     border-radius: 999px;
     color: #fff;
@@ -168,15 +215,15 @@
     font-weight: 800;
   }
 
-  .tag.research { background: var(--clay); }
+  .tag.strategy { background: var(--clay); }
   .tag.external { background: var(--blue); }
-  .tag.asset { background: var(--forest); }
-  .tag.tech { background: var(--rose); }
+  .tag.asset { background: var(--moss); }
+  .tag.tech { background: var(--wine); }
 
   h3 {
-    margin: 0 0 10px;
+    margin: 0;
     font-size: 20px;
-    line-height: 1.28;
+    line-height: 1.32;
     letter-spacing: 0;
   }
 
@@ -187,24 +234,19 @@
   }
 
   .meta {
-    margin-top: 18px;
-    color: var(--gold);
+    color: var(--clay);
     font-size: 13px;
     font-weight: 800;
   }
 
-  @media (max-width: 920px) {
-    header,
-    .grid {
+  @media (max-width: 900px) {
+    .hero,
+    .cards {
       grid-template-columns: 1fr;
     }
 
     h1 {
-      font-size: 36px;
-    }
-
-    .hero {
-      padding: 30px;
+      font-size: 38px;
     }
   }
 
@@ -214,8 +256,14 @@
       padding-top: 18px;
     }
 
+    .hero-main,
+    .focus-panel,
+    .section {
+      padding: 20px;
+    }
+
     h1 {
-      font-size: 30px;
+      font-size: 31px;
     }
 
     .section-head {
@@ -226,123 +274,129 @@
 </head>
 <body>
 <main class="page">
-  <header>
-    <section class="hero">
-      <p class="eyebrow">Producer Workspace</p>
-      <h1>游戏项目资料主页</h1>
-      <p class="lead">这里集中存放项目研究、产品策略、外部优秀报告、资产验收与技术归档。当前主页按制作人日常工作流重新整理，方便快速进入关键材料。</p>
+  <header class="hero">
+    <section class="hero-main">
+      <div>
+        <p class="eyebrow">Producer Workspace</p>
+        <h1>游戏项目资料主页</h1>
+        <p class="lead">这里是面向制作人工作的资料入口：项目方向、产品结构、外部参考、资产验收和技术归档都放在同一处，重点是快速判断“下一步看哪份材料”。</p>
+      </div>
+      <nav class="hero-links" aria-label="快速跳转">
+        <a href="#strategy">项目策略</a>
+        <a href="#external">外部资料</a>
+        <a href="#assets">资产验收</a>
+        <a href="#tech">技术归档</a>
+      </nav>
     </section>
-    <aside class="dashboard" aria-label="资料概览">
-      <div class="metric"><strong>2</strong><span>项目研究与产品策略报告</span></div>
-      <div class="metric"><strong>2</strong><span>外部优秀 HTML 文档入口</span></div>
-      <div class="metric"><strong>3</strong><span>Sprite Forge 验收看板</span></div>
-      <div class="metric"><strong>3</strong><span>技术架构归档</span></div>
+    <aside class="focus-panel">
+      <h2>近期重点</h2>
+      <ul class="focus-list">
+        <li><strong>统一团队方向</strong><span>先看团队传达稿，明确当前不是定题材，而是做低成本结构验证。</span></li>
+        <li><strong>验证产品结构</strong><span>结合圆桌访谈和《我的花园世界》研究，判断基座、前端和商业化路径。</span></li>
+        <li><strong>沉淀外部参考</strong><span>Kimi 外部文档已改为可识别标题，后续可以继续按主题加入。</span></li>
+      </ul>
     </aside>
   </header>
 
-  <section class="section">
+  <section class="section" id="strategy">
     <div class="section-head">
-      <h2>项目研究与产品策略</h2>
-      <p class="section-note">围绕玩法基座、商业化路径、验证方式和制作人决策。</p>
+      <div>
+        <h2>项目策略与产品研究</h2>
+        <p class="section-note">用于团队沟通、方向判断、MVP 范围和产品结构讨论。</p>
+      </div>
     </div>
-    <div class="grid">
+    <div class="cards">
+      <a class="card" href="./game-research/team-direction-briefing-2026-05-30.html">
+        <span class="tag strategy">团队传达</span>
+        <h3>新项目方向团队传达内容梳理稿</h3>
+        <p>面向团队说明当前验证边界：不是宣布确定题材，而是围绕低成本产品结构做最小闭环测试。</p>
+        <div class="meta">2026-05-30</div>
+      </a>
       <a class="card" href="./game-research/three-role-dialogue-2026-05-30.html">
-        <div>
-          <span class="tag research">圆桌访谈</span>
-          <h3>花园世界基座 + X 前端路线三方圆桌访谈记录</h3>
-          <p>以三方对话方式梳理项目基座、前端路线、风险判断和共识结论。</p>
-        </div>
+        <span class="tag strategy">圆桌访谈</span>
+        <h3>花园世界基座 + X 前端路线三方圆桌访谈记录</h3>
+        <p>以三方对话方式梳理项目基座、前端路线、风险判断和共识结论。</p>
         <div class="meta">2026-05-30</div>
       </a>
       <a class="card" href="./game-research/my-garden-world-us-project-2026-05-25.html">
-        <div>
-          <span class="tag research">产品研究</span>
-          <h3>《我的花园世界》产品机制研究与产品策略参考</h3>
-          <p>拆解产品结构、消耗模型、竞争路径、设计红线与 MVP 验证标准。</p>
-        </div>
+        <span class="tag strategy">产品研究</span>
+        <h3>《我的花园世界》产品机制研究与产品策略参考</h3>
+        <p>拆解产品结构、消耗模型、竞争路径、设计红线与 MVP 验证标准。</p>
         <div class="meta">2026-05-25</div>
       </a>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="external">
     <div class="section-head">
-      <h2>外部优质文档</h2>
-      <p class="section-note">其他人总结得好的资料，保留原链接跳转。</p>
+      <div>
+        <h2>外部优质文档</h2>
+        <p class="section-note">保留原链接跳转，但用明确标题和摘要管理，避免后续数量变多后难以识别。</p>
+      </div>
     </div>
-    <div class="grid">
+    <div class="cards">
       <a class="card" href="https://upy4l3m3qnegc.ok.kimi.link/#/">
-        <div>
-          <span class="tag external">Kimi 文档</span>
-          <h3>外部优秀 HTML 文档 A</h3>
-          <p>保留原始在线链接，作为项目调研与观点对照资料。</p>
-        </div>
-        <div class="meta">外部链接</div>
+        <span class="tag external">资源经济</span>
+        <h3>《我的花园世界》资源经济深度研究</h3>
+        <p>聚焦资源生产、消耗、循环效率和经济压力，用于判断花园经营基座是否能支撑长期目标。</p>
+        <div class="meta">Kimi 外部链接</div>
       </a>
       <a class="card" href="https://kblb6hdbtbfto.ok.kimi.link/">
-        <div>
-          <span class="tag external">Kimi 文档</span>
-          <h3>外部优秀 HTML 文档 B</h3>
-          <p>用于快速跳转到第三方总结材料，便于集中查阅。</p>
-        </div>
-        <div class="meta">外部链接</div>
+        <span class="tag external">商业化</span>
+        <h3>《我的花园世界》商业化梳理报告</h3>
+        <p>基于游戏机制与社区舆论梳理 IAP + IAA 混合变现、付费分层、花灵系统和玩家反馈。</p>
+        <div class="meta">Kimi 外部链接</div>
       </a>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="assets">
     <div class="section-head">
-      <h2>资产与验收看板</h2>
-      <p class="section-note">角色动作、特效边界和视觉验收相关资料。</p>
+      <div>
+        <h2>资产与验收看板</h2>
+        <p class="section-note">角色动作、特效边界和视觉验收相关资料。</p>
+      </div>
     </div>
-    <div class="grid">
+    <div class="cards">
       <a class="card" href="./outputs/sprite-tests/pixel-island-scout-hero-action-consistency/qc/visual-report.html">
-        <div>
-          <span class="tag asset">Sprite QC</span>
-          <h3>主角跨动作一致性验收看板</h3>
-          <p>角色动作一致性验收，包含动作预览、测量结果与结论摘要。</p>
-        </div>
+        <span class="tag asset">Sprite QC</span>
+        <h3>主角跨动作一致性验收看板</h3>
+        <p>角色动作一致性验收，包含动作预览、测量结果与结论摘要。</p>
         <div class="meta">角色动作</div>
       </a>
       <a class="card" href="./outputs/sprite-tests/pixel-island-scout-fx-boundary-test/qc/visual-report.html">
-        <div>
-          <span class="tag asset">FX QC</span>
-          <h3>特效验收面板</h3>
-          <p>FX boundary 测试报告，展示特效合格边界、预览图与结构化结论。</p>
-        </div>
+        <span class="tag asset">FX QC</span>
+        <h3>特效验收面板</h3>
+        <p>FX boundary 测试报告，展示特效合格边界、预览图与结构化结论。</p>
         <div class="meta">特效边界</div>
       </a>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="tech">
     <div class="section-head">
-      <h2>技术归档</h2>
-      <p class="section-note">仍然保留早期技术研究，作为工具链和架构参考。</p>
+      <div>
+        <h2>技术归档</h2>
+        <p class="section-note">保留早期工具链和源码架构研究，作为团队技术背景资料。</p>
+      </div>
     </div>
-    <div class="grid">
+    <div class="cards">
       <a class="card" href="./deepseek-tui-vs-claude-code.html">
-        <div>
-          <span class="tag tech">架构对比</span>
-          <h3>DeepSeek TUI vs Claude Code</h3>
-          <p>源码架构对比详解，适合横向理解两个项目的设计取舍。</p>
-        </div>
+        <span class="tag tech">架构对比</span>
+        <h3>DeepSeek TUI vs Claude Code</h3>
+        <p>源码架构对比详解，适合横向理解两个项目的设计取舍。</p>
         <div class="meta">技术研究</div>
       </a>
       <a class="card" href="./claude-code-architecture.html">
-        <div>
-          <span class="tag tech">源码架构</span>
-          <h3>Claude Code 源码架构详解</h3>
-          <p>由浅入深梳理 Claude Code 的源码结构、关键模块与运行机制。</p>
-        </div>
+        <span class="tag tech">源码架构</span>
+        <h3>Claude Code 源码架构详解</h3>
+        <p>由浅入深梳理 Claude Code 的源码结构、关键模块与运行机制。</p>
         <div class="meta">技术研究</div>
       </a>
       <a class="card" href="./feishu-cli-architecture.html">
-        <div>
-          <span class="tag tech">CLI 架构</span>
-          <h3>飞书 CLI 源码架构解析</h3>
-          <p>梳理飞书 CLI 的源码结构、核心模块与运行流程。</p>
-        </div>
+        <span class="tag tech">CLI 架构</span>
+        <h3>飞书 CLI 源码架构解析</h3>
+        <p>梳理飞书 CLI 的源码结构、核心模块与运行流程。</p>
         <div class="meta">技术研究</div>
       </a>
     </div>

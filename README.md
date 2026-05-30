@@ -7,5 +7,6 @@ Static GitHub Pages site for two HTML architecture documents.
 - `feishu-cli-architecture.html`
 - `game-research/three-role-dialogue-2026-05-30.html`
 - `game-research/my-garden-world-us-project-2026-05-25.html`
+- `game-research/team-direction-briefing-2026-05-30.html`
 - `outputs/sprite-tests/pixel-island-scout-hero-action-consistency/qc/visual-report.html`
 - `outputs/sprite-tests/pixel-island-scout-fx-boundary-test/qc/visual-report.html`
